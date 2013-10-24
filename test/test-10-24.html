@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MVVM</title>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="../lib/load.js"></script>
+</head>
+<body>
+<div id="content">
+    <p>First name: <strong data-bind="text:firstName ">todo</strong></p>
+    <p>Last name: <strong data-bind="text:lastName ">todo</strong></p>
+    <p><input type="text" data-bind=""/></p>
+</div>
+
+
+<script type="text/javascript">
+
+    require('../src/mvvm',function(mvvm){
+
+            mvvm.bind({})
+
+    })
+ 
+
+</script>
+</body>
+</html>
