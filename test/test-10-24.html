@@ -4,6 +4,22 @@
     <title>MVVM</title>
     <meta charset="UTF-8">
     <script type="text/javascript" src="../lib/load.js"></script>
+    <script type="text/javascript">
+
+
+        require('../src/mvvm',function(mvvm){
+
+            window.o = {
+                        firstName:mvvm.observable('li'),
+                        lastName:'Ly</span>'
+                    }
+
+                mvvm.applyBindings(o)
+
+        })
+     
+//o.firstName('11')
+    </script>
 </head>
 <body>
 <div id="content">
@@ -13,15 +29,6 @@
 </div>
 
 
-<script type="text/javascript">
 
-    require('../src/mvvm',function(mvvm){
-
-            mvvm.bind({})
-
-    })
- 
-
-</script>
 </body>
 </html>
