@@ -11,21 +11,29 @@
 
             window.o = {
                         firstName:mvvm.observable('li'),
-                        lastName:'Ly</span>'
+                        lastName:'Ly</span>',
+						age:mvvm.observable('1111')
                     }
 
-                mvvm.applyBindings(o)
-
+                mvvm.applyBindings(o,document.getElementById('content'))
+			
+			document.getElementById('myBtn').onclick = function(){
+				o.age(this.value);
+			}
+			
         })
      
 //o.firstName('11')
     </script>
 </head>
 <body>
+<p>First name: <strong data-bind="text:firstName ">todo</strong></p>
 <div id="content">
-    <p>First name: <strong data-bind="text:firstName ">todo</strong></p>
+	<p>First name: <strong data-bind="text:firstName ">todo</strong></p>
     <p>Last name: <strong data-bind="text:lastName ">todo</strong></p>
-    <p><input type="text" data-bind=""/></p>
+	<p>Age: <strong data-bind="text:age ">todo</strong></p>
+	<p>Age: <span data-bind="text:age ">todo</span></p>
+    <p><input type="button" value="changeTo123" id="myBtn"/></p>
 </div>
 
 

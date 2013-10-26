@@ -24,7 +24,7 @@ define([url_prefix+'data/data',
 	        subUid = -1;
 	    // 发布方法
 	    q.publish = function (topic, args) {
-	    	console.log(topics)
+
 	        if (!topics[topic]) {
 	            return false;
 	        }
@@ -34,7 +34,7 @@ define([url_prefix+'data/data',
 	                len = subscribers ? subscribers.length : 0;
 
 	            while (len--) {
-	                subscribers[len].func(topic, args);
+	                subscribers[len].func(args,topic);
 	            }
 	        }, 0);
 
@@ -53,7 +53,6 @@ define([url_prefix+'data/data',
 	            token: token,
 	            func: func
 	        });
-	        console.log(topics)
 	        return token;
 	    };
 	    //退订方法
@@ -86,10 +85,22 @@ define([url_prefix+'data/data',
 		})
 	}
 
-
+	//通过闭包保存dom和事件trigger,实现绑定
 	mvvm.observable = function(val){
-		return function(newVal,currentDom,random){
-			pubsub.publish(random,[newVal || val,currentDom]);
+		var _currentDom = [],
+			_random = [];
+		return function(newVal,currentDom,random,bindLast){
+			if(currentDom){
+				_currentDom.push(currentDom)
+			}
+			if(random){
+				_random.push(random);
+			}
+			var  i = bindLast ? _random.length-1:0;//初始化绑定只绑定最后一个
+			for(var i = 0;i<_random.length;i++){
+				pubsub.publish(_random[i],[newVal || val,_currentDom[i]]);
+			}
+			
 		}
 	}   
 	/*
@@ -150,15 +161,15 @@ define([url_prefix+'data/data',
 				text = utils.trim(text);
 				var type = utils.getType(vm[text]);
 				var value;
-				var random = getMandom();
+				var random = getRandom();
 				cuurentFn = bindRoute[execAry[1]];
 				
 				if(type === 'String'){
 					value = vm[text];
-					cuurentFn(null,[value,currentDom]);
+					cuurentFn([value,currentDom]);
 				}else if(type === 'Function'){
-					pubsub.subscribe(random,cuurentFn)
-					vm[text](undefined,currentDom,random);					
+					pubsub.subscribe(random,cuurentFn);
+					vm[text](undefined,currentDom,random,true);
 				}
 				
 			}
@@ -167,16 +178,16 @@ define([url_prefix+'data/data',
 
 
 	//text绑定
-	function routeTextFn(isNull,ary){
-		console.log(ary)
+	//ary:[dom,text]
+	function routeTextFn(ary){
 		setText(ary[1],ary[0]);
 	}
 
 
 	//################################
 	//常用方法
-	function getMandom(){
-		return new Date().getTime();
+	function getRandom(){
+		return Math.random();
 	}
 
 
