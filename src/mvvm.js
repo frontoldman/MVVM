@@ -120,8 +120,9 @@ define([url_prefix+'data/data',
 			if(domAttrName == undefined){
 				domAttrName = currentDom[mvvm.trigger];
 			}
-
+			
 			if( domAttrName != undefined) {
+				domAttrName = utils.trim(domAttrName);
 				dataBindDomLists.push({
 					dom:currentDom,
 					attr:domAttrName
@@ -131,17 +132,18 @@ define([url_prefix+'data/data',
 		domLocateds = null;
 		return dataBindDomLists;
 	}
-
-	/*
-	分析绑定规则
-	 */
-	var bindPattern = /^\s*(text|visible|html|css|style|attr)\s*:\s*(.+)\s*$/;
+	
+	
 	var bindRoute = {
-		text:routeTextFn
+		text:routeTextFn,
+		css:routeCssFn
 	}
-	/*
-	domsAndAttrs:[]
-	 */
+
+	//有史以来最伟大的正则表达式诞生了
+	var mainBindPatternStr = '\\s*(?:([^,?:]+)\\s*:\\s*){1}?([^,]*\\{(?:.+:.+,?)*\\}|\\[[^\\]]*\\]|[^,]*\\?[^:]*:[^,]*|[^\\{:\\}\\[\\],]*)';
+	var bindPattern;
+
+	 
 	function analysisBindRulers(vm,domsAndAttrs){
 		var i = 0,
 			len = domsAndAttrs.length,
@@ -149,33 +151,84 @@ define([url_prefix+'data/data',
 			currentDom,
 			currentAttr,
 			cuurentFn;
-		if(len === i) return;
+
 		for(;i<len;i++){
 			currentDom = domsAndAttrs[i].dom;
 			currentAttr = domsAndAttrs[i].attr;
+			bindPattern = new RegExp(mainBindPatternStr,'g');
 			execAry = bindPattern.exec(currentAttr);
-			if(execAry && execAry.length>=3){
+	
+			while(execAry && execAry.length>=3){
 				//分发出去
 				//console.log(execAry)
 				var text = execAry[2];
 				text = utils.trim(text);
-				var type = utils.getType(vm[text]);
-				var value;
-				var random = getRandom();
-				cuurentFn = bindRoute[execAry[1]];
+				var value = vm[text],
+					random,
+					type;
+				cuurentFn = bindRoute[execAry[1]] ? bindRoute[execAry[1]]
+													: function(){};
 				
-				if(type === 'String'){
-					value = vm[text];
-					cuurentFn([value,currentDom]);
-				}else if(type === 'Function'){
-					pubsub.subscribe(random,cuurentFn);
-					vm[text](undefined,currentDom,random,true);
+				if(value){
+					type = utils.getType(value);
+					
+					switch(type){
+						case 'String':
+							cuurentFn([value,currentDom]);
+							break;
+						case 'Function':
+							random = getRandom();
+							pubsub.subscribe(random,cuurentFn);
+							value(undefined,currentDom,random,true);
+							break;
+						default:
+							break;
+					}
+				}else{
+					
+					(function(){
+					
+						var varStr = convertVariableScope(vm);
+						
+						var fn ;
+						try{
+							fn = (new Function(varStr + 'return ' + new Function('return ' + text)))
+						}catch(e){
+							throw 'Error expressions!';
+						}
+
+						value = fn().bind(vm)();
+						cuurentFn([value,currentDom])
+					})()
 				}
 				
+				execAry = bindPattern.exec(currentAttr);
 			}
 		}
 	}
-
+	
+	
+	function convertVariableScope(vm){
+		var varStr = '',
+		value,
+		flag,
+		quotes ;
+		for(var i in vm){
+			value = vm[i];
+			if(utils.getType(value) === 'String'){
+				if(/'/.test(value)){
+					value = '"' + value + '"';
+				}else{
+					value = "'" + value + "'";
+				}
+				
+			}else{
+				value = value.toString();
+			}
+			varStr += ('var ' + i +' = ' + value + ';\n');
+		}
+		return varStr;
+	}
 
 	//text绑定
 	//ary:[dom,text]
@@ -183,7 +236,10 @@ define([url_prefix+'data/data',
 		setText(ary[1],ary[0]);
 	}
 
-
+	//css绑定
+	function routeCssFn(){
+		
+	}
 	//################################
 	//常用方法
 	function getRandom(){
@@ -201,6 +257,36 @@ define([url_prefix+'data/data',
 			dom.innerText = text;
 		}
 	}
+	
+	
+	//############################################################
+	//扩展方法
+	//from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
+	if (!Function.prototype.bind) {
+	  Function.prototype.bind = function (oThis) {
+		if (typeof this !== "function") {
+		  // closest thing possible to the ECMAScript 5 internal IsCallable function
+		  throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+		}
 
+		var aArgs = Array.prototype.slice.call(arguments, 1), 
+			fToBind = this, 
+			fNOP = function () {},
+			fBound = function () {
+			  return fToBind.apply(this instanceof fNOP && oThis
+									 ? this
+									 : oThis,
+								   aArgs.concat(Array.prototype.slice.call(arguments)));
+			};
+
+		fNOP.prototype = this.prototype;
+		fBound.prototype = new fNOP();
+
+		return fBound;
+	  };
+	}
+	
+	
+	
 	return mvvm;
 })
