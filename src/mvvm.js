@@ -86,6 +86,7 @@ define([url_prefix+'data/data',
 	}
 
 	//通过闭包保存dom和事件trigger,实现绑定
+	/**
 	mvvm.observable = function(val){
 		var _currentDom = [],
 			_random = [];
@@ -103,6 +104,13 @@ define([url_prefix+'data/data',
 			
 		}
 	}   
+	**/
+	mvvm.observable = function(val){
+		return function (newVal,currentDom,random){
+			pubsub.publish(random,[newVal || val,currentDom]);
+		}
+	}   
+	
 	/*
 	取得所有符合条件节点
 	 */
@@ -138,12 +146,66 @@ define([url_prefix+'data/data',
 		text:routeTextFn,
 		css:routeCssFn
 	}
-
+	
+	
+	
+	
 	//有史以来最伟大的正则表达式诞生了
 	var mainBindPatternStr = '\\s*(?:([^,?:]+)\\s*:\\s*){1}?([^,]*\\{(?:.+:.+,?)*\\}|\\[[^\\]]*\\]|[^,]*\\?[^:]*:[^,]*|[^\\{:\\}\\[\\],]*)';
 	var bindPattern;
+	
+	function analysisBindRulers(vm,domsAndAttrs){
+		var i = 0,
+			len = domsAndAttrs.length,
+			currentDom,
+			currentAttr,
+			varStr,
+			_fn,
+			bindKey,
+			vmValue,
+			type,
+			currentFn,
+			random,
+			attrsValueObject;
 
-	 
+		for(;i<len;i++){
+			currentDom = domsAndAttrs[i].dom;
+			currentAttr = domsAndAttrs[i].attr;
+		
+			varStr = convertVariableScope(vm);
+			try{
+				_fn = (new Function(varStr + 'return ' + new Function('return {' + currentAttr + ' }')))
+			}catch(e){
+				throw 'Error expressions!';
+			}
+			
+			attrsValueObject = _fn().bind(vm)();
+			//console.log(attrsValueObject)
+			console.log(vm)
+			for(bindKey in attrsValueObject){
+				vmValue = attrsValueObject[bindKey]
+				type = utils.getType(vmValue);
+				currentFn = bindRoute[bindKey] ? bindRoute[bindKey]
+													: function(){};
+				
+				switch(type){
+					case 'String':
+						currentFn([vmValue,currentDom]);
+						break;
+					case 'Function':
+						random = getRandom();
+						pubsub.subscribe(random,currentFn);
+						console.log(vmValue)
+						//vmValue(undefined,currentDom,random,true);
+						break;
+					default:
+						break;
+				}
+			}	
+		}
+	}
+	
+	 /**
 	function analysisBindRulers(vm,domsAndAttrs){
 		var i = 0,
 			len = domsAndAttrs.length,
@@ -206,22 +268,23 @@ define([url_prefix+'data/data',
 			}
 		}
 	}
-	
+	**/
 	
 	function convertVariableScope(vm){
 		var varStr = '',
 		value,
 		flag,
-		quotes ;
+		quotes ,
+		type;
 		for(var i in vm){
 			value = vm[i];
-			if(utils.getType(value) === 'String'){
+			type = utils.getType(value);
+			if(type === 'String'){
 				if(/'/.test(value)){
 					value = '"' + value + '"';
 				}else{
 					value = "'" + value + "'";
 				}
-				
 			}else{
 				value = value.toString();
 			}

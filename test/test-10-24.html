@@ -15,7 +15,7 @@
 						age:mvvm.observable('1111'),
 						css:'red',
 						price:function(){
-							return 100;
+							return this.css;
 						}
                     }
 
@@ -33,7 +33,7 @@
 <body>
 <p>First name: <strong data-bind="text:firstName ">todo</strong></p>
 <div id="content">
-	<p>price: <strong data-bind="text:this.price() > 50 ? 'expensive' : 'cheap'">todo</strong></p>
+	<p>price: <strong data-bind="text:price()">todo</strong></p>
 	<p>First name: <strong data-bind="text:{x:1,y:1}">todo</strong></p>
     <p>Last name: <strong data-bind="text:lastName">todo</strong></p>
 	<p>Age: <strong data-bind="text:age ">todo</strong></p>
