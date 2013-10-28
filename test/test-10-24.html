@@ -10,20 +10,23 @@
 
         require('../src/mvvm',function(mvvm){
 
+               var name='li' 
             window.o = {
+                        name:'zr',
                         lastName:'Ly</span>',
-						age:mvvm.observable('1111'),
-						css:'red',
-						price:function(){
-							return this.css;
-						}
+		age:mvvm.observable('1111'),
+		css:'red',
+		price:function(){
+                                        console.log(this)
+			return name;
+		}
                     }
 
                 mvvm.applyBindings(o,document.getElementById('content'))
 			
-			document.getElementById('myBtn').onclick = function(){
-				o.age(this.value);
-			}
+	document.getElementById('myBtn').onclick = function(){
+		o.age(this.value);
+	}
 			
         })
      
@@ -34,7 +37,7 @@
 <p>First name: <strong data-bind="text:firstName ">todo</strong></p>
 <div id="content">
 	<p>price: <strong data-bind="text:price()">todo</strong></p>
-	<p>First name: <strong data-bind="text:{x:1,y:1}">todo</strong></p>
+	<p>First name: <strong data-bind="text:lastName">todo</strong></p>
     <p>Last name: <strong data-bind="text:lastName">todo</strong></p>
 	<p>Age: <strong data-bind="text:age ">todo</strong></p>
 	<p>Age: <span data-bind="text:age ">todo</span></p>

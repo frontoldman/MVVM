@@ -86,7 +86,7 @@ define([url_prefix+'data/data',
 	}
 
 	//通过闭包保存dom和事件trigger,实现绑定
-	/**
+	
 	mvvm.observable = function(val){
 		var _currentDom = [],
 			_random = [];
@@ -104,13 +104,13 @@ define([url_prefix+'data/data',
 			
 		}
 	}   
-	**/
+	/**
 	mvvm.observable = function(val){
 		return function (newVal,currentDom,random){
 			pubsub.publish(random,[newVal || val,currentDom]);
 		}
 	}   
-	
+	**/
 	/*
 	取得所有符合条件节点
 	 */
@@ -154,6 +154,7 @@ define([url_prefix+'data/data',
 	var mainBindPatternStr = '\\s*(?:([^,?:]+)\\s*:\\s*){1}?([^,]*\\{(?:.+:.+,?)*\\}|\\[[^\\]]*\\]|[^,]*\\?[^:]*:[^,]*|[^\\{:\\}\\[\\],]*)';
 	var bindPattern;
 	
+	/**
 	function analysisBindRulers(vm,domsAndAttrs){
 		var i = 0,
 			len = domsAndAttrs.length,
@@ -174,19 +175,19 @@ define([url_prefix+'data/data',
 		
 			varStr = convertVariableScope(vm);
 			try{
-				_fn = (new Function(varStr + 'return ' + new Function('return {' + currentAttr + ' }')))
+				_fn = (new Function(varStr + 'return  {' + currentAttr + ' }'))
 			}catch(e){
 				throw 'Error expressions!';
 			}
 			
-			attrsValueObject = _fn().bind(vm)();
+			attrsValueObject = _fn.bind(vm)();
 			//console.log(attrsValueObject)
-			console.log(vm)
+			//console.log(vm)
 			for(bindKey in attrsValueObject){
 				vmValue = attrsValueObject[bindKey]
 				type = utils.getType(vmValue);
 				currentFn = bindRoute[bindKey] ? bindRoute[bindKey]
-													: function(){};
+								: function(){};
 				
 				switch(type){
 					case 'String':
@@ -204,8 +205,9 @@ define([url_prefix+'data/data',
 			}	
 		}
 	}
-	
-	 /**
+	**/
+	 
+	 
 	function analysisBindRulers(vm,domsAndAttrs){
 		var i = 0,
 			len = domsAndAttrs.length,
@@ -229,7 +231,7 @@ define([url_prefix+'data/data',
 					random,
 					type;
 				cuurentFn = bindRoute[execAry[1]] ? bindRoute[execAry[1]]
-													: function(){};
+									: function(){};
 				
 				if(value){
 					type = utils.getType(value);
@@ -246,29 +248,31 @@ define([url_prefix+'data/data',
 						default:
 							break;
 					}
-				}else{
-					
-					(function(){
-					
-						var varStr = convertVariableScope(vm);
-						
-						var fn ;
-						try{
-							fn = (new Function(varStr + 'return ' + new Function('return ' + text)))
-						}catch(e){
-							throw 'Error expressions!';
-						}
-
-						value = fn().bind(vm)();
-						cuurentFn([value,currentDom])
-					})()
+				}else{					
+					var varStr = convertVariableScope(vm);
+					var fn ;
+					//console.log(text)
+					try{
+						fn = new Function(varStr + 'return '  + text);
+					}catch(e){
+						throw 'Wrong expressions!';
+					}
+					//console.log(fn);
+					vm[text] = fn;
+					//console.log()
+					//fn.bind(vm);
+					//var __fn = fn.apply(vm);
+					//console.log(__fn);
+					value = vm[text]();
+					//console.log(value)
+					cuurentFn([value,currentDom])
 				}
 				
 				execAry = bindPattern.exec(currentAttr);
 			}
 		}
 	}
-	**/
+	
 	
 	function convertVariableScope(vm){
 		var varStr = '',
@@ -285,7 +289,7 @@ define([url_prefix+'data/data',
 				}else{
 					value = "'" + value + "'";
 				}
-			}else{
+			}else {
 				value = value.toString();
 			}
 			varStr += ('var ' + i +' = ' + value + ';\n');
