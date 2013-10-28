@@ -18,7 +18,7 @@
 		css:'red',
 		price:function(){
                                         console.log(this)
-			return name;
+			//return name;
 		}
                     }
 
@@ -29,15 +29,17 @@
 	}
 			
         })
-     
+     var price = 
+
+    // price();
 //o.firstName('11')
     </script>
 </head>
 <body>
 <p>First name: <strong data-bind="text:firstName ">todo</strong></p>
 <div id="content">
-	<p>price: <strong data-bind="text:price()">todo</strong></p>
-	<p>First name: <strong data-bind="text:lastName">todo</strong></p>
+	<p>price: <strong data-bind="text:price()?''aa":>todo</strong></p>
+	<p>First name: <strong data-bind="text:{{}}>todo</strong></p>
     <p>Last name: <strong data-bind="text:lastName">todo</strong></p>
 	<p>Age: <strong data-bind="text:age ">todo</strong></p>
 	<p>Age: <span data-bind="text:age ">todo</span></p>

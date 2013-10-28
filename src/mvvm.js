@@ -257,7 +257,7 @@ define([url_prefix+'data/data',
 					}catch(e){
 						throw 'Wrong expressions!';
 					}
-					//console.log(fn);
+					console.log(fn);
 					vm[text] = fn;
 					//console.log()
 					//fn.bind(vm);
