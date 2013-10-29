@@ -3,6 +3,11 @@
 <head>
     <title>MVVM</title>
     <meta charset="UTF-8">
+    <style type="text/style">
+    .red{
+        color:red;
+    }
+    </style>
     <script type="text/javascript" src="../lib/load.js"></script>
     <script type="text/javascript">
 		
@@ -13,13 +18,15 @@
                var name='li' 
             window.o = {
                         name:'zr',
+                        firstName:'li',
                         lastName:'Ly</span>',
 		age:mvvm.observable('1111'),
 		css:'red',
 		price:function(){
-                                        console.log(this)
-			//return name;
-		}
+                                  //      console.log(this)
+			return this.css;
+		},
+                                y:'wsww'
                     }
 
                 mvvm.applyBindings(o,document.getElementById('content'))
@@ -27,9 +34,24 @@
 	document.getElementById('myBtn').onclick = function(){
 		o.age(this.value);
 	}
-			
+	
+        var sayHi = new Function("sName", "sMessage", "alert(\"Hello \" + sName + sMessage);");
+
+            var y
+            with(o){
+                var y = 100;
+                /*y = {
+                    text:price()
+                }*/
+             //   console.log(y, o)
+            }
+            
+        
+       // var vm = {};
+       // new Function('vm','var attrObj ;with(window){attrObj = {}};return attrObj;')
+
         })
-     var price = 
+
 
     // price();
 //o.firstName('11')
@@ -38,9 +60,9 @@
 <body>
 <p>First name: <strong data-bind="text:firstName ">todo</strong></p>
 <div id="content">
-	<p>price: <strong data-bind="text:price()?''aa":>todo</strong></p>
-	<p>First name: <strong data-bind="text:{{}}>todo</strong></p>
-    <p>Last name: <strong data-bind="text:lastName">todo</strong></p>
+	<p>price: <strong data-bind="text:this.price()">todo</strong></p>
+	<p>First name: <strong data-bind="text:firstName">todo</strong></p>
+    <p>Last name: <strong data-bind="css:css,text:lastName">todo</strong></p>
 	<p>Age: <strong data-bind="text:age ">todo</strong></p>
 	<p>Age: <span data-bind="text:age ">todo</span></p>
     <p><input type="button" value="changeTo123" id="myBtn"/></p>

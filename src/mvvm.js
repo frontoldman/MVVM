@@ -104,13 +104,7 @@ define([url_prefix+'data/data',
 			
 		}
 	}   
-	/**
-	mvvm.observable = function(val){
-		return function (newVal,currentDom,random){
-			pubsub.publish(random,[newVal || val,currentDom]);
-		}
-	}   
-	**/
+	
 	/*
 	取得所有符合条件节点
 	 */
@@ -154,7 +148,7 @@ define([url_prefix+'data/data',
 	var mainBindPatternStr = '\\s*(?:([^,?:]+)\\s*:\\s*){1}?([^,]*\\{(?:.+:.+,?)*\\}|\\[[^\\]]*\\]|[^,]*\\?[^:]*:[^,]*|[^\\{:\\}\\[\\],]*)';
 	var bindPattern;
 	
-	/**
+	
 	function analysisBindRulers(vm,domsAndAttrs){
 		var i = 0,
 			len = domsAndAttrs.length,
@@ -173,18 +167,19 @@ define([url_prefix+'data/data',
 			currentDom = domsAndAttrs[i].dom;
 			currentAttr = domsAndAttrs[i].attr;
 		
-			varStr = convertVariableScope(vm);
+			//varStr = convertVariableScope(vm);
+			
 			try{
-				_fn = (new Function(varStr + 'return  {' + currentAttr + ' }'))
+				_fn = new Function('scope','var attrObj ;with( scope ){attrObj = {'+ currentAttr +'}};return attrObj;')
 			}catch(e){
 				throw 'Error expressions!';
 			}
 			
-			attrsValueObject = _fn.bind(vm)();
-			//console.log(attrsValueObject)
+			attrsValueObject = _fn.bind(vm)(vm);
+			console.log(attrsValueObject)
 			//console.log(vm)
 			for(bindKey in attrsValueObject){
-				vmValue = attrsValueObject[bindKey]
+				vmValue = attrsValueObject[bindKey];
 				type = utils.getType(vmValue);
 				currentFn = bindRoute[bindKey] ? bindRoute[bindKey]
 								: function(){};
@@ -196,8 +191,7 @@ define([url_prefix+'data/data',
 					case 'Function':
 						random = getRandom();
 						pubsub.subscribe(random,currentFn);
-						console.log(vmValue)
-						//vmValue(undefined,currentDom,random,true);
+						vmValue(undefined,currentDom,random,true);
 						break;
 					default:
 						break;
@@ -205,9 +199,9 @@ define([url_prefix+'data/data',
 			}	
 		}
 	}
-	**/
+	
 	 
-	 
+	 /**
 	function analysisBindRulers(vm,domsAndAttrs){
 		var i = 0,
 			len = domsAndAttrs.length,
@@ -272,40 +266,41 @@ define([url_prefix+'data/data',
 			}
 		}
 	}
+	**/
 	
-	
-	function convertVariableScope(vm){
-		var varStr = '',
-		value,
-		flag,
-		quotes ,
-		type;
-		for(var i in vm){
-			value = vm[i];
-			type = utils.getType(value);
-			if(type === 'String'){
-				if(/'/.test(value)){
-					value = '"' + value + '"';
-				}else{
-					value = "'" + value + "'";
-				}
-			}else {
-				value = value.toString();
-			}
-			varStr += ('var ' + i +' = ' + value + ';\n');
-		}
-		return varStr;
-	}
+	// function convertVariableScope(vm){
+	// 	var varStr = '',
+	// 	value,
+	// 	flag,
+	// 	quotes ,
+	// 	type;
+	// 	for(var i in vm){
+	// 		value = vm[i];
+	// 		type = utils.getType(value);
+	// 		if(type === 'String'){
+	// 			if(/'/.test(value)){
+	// 				value = '"' + value + '"';
+	// 			}else{
+	// 				value = "'" + value + "'";
+	// 			}
+	// 		}else {
+	// 			value = value.toString();
+	// 		}
+	// 		varStr += ('var ' + i +' = ' + value + ';\n');
+	// 	}
+	// 	return varStr;
+	// }
 
 	//text绑定
-	//ary:[dom,text]
+	//ary:[text,dom]
 	function routeTextFn(ary){
 		setText(ary[1],ary[0]);
 	}
 
 	//css绑定
-	function routeCssFn(){
-		
+	//ary:[className,dom]
+	function routeCssFn(ary){
+		setClassName(ary[1],ary[0]);
 	}
 	//################################
 	//常用方法
@@ -325,6 +320,9 @@ define([url_prefix+'data/data',
 		}
 	}
 	
+	function setClassName(dom,className){
+		
+	}
 	
 	//############################################################
 	//扩展方法
