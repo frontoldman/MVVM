@@ -3,9 +3,12 @@
 <head>
     <title>MVVM</title>
     <meta charset="UTF-8">
-    <style type="text/style">
+    <style type="text/css">
     .red{
         color:red;
+    }
+    .green{
+        color:green;
     }
     </style>
     <script type="text/javascript" src="../lib/load.js"></script>
@@ -15,56 +18,41 @@
 
         require('../src/mvvm',function(mvvm){
 
-               var name='li' 
+
             window.o = {
-                        name:'zr',
+         
                         firstName:'li',
                         lastName:'Ly</span>',
-		age:mvvm.observable('1111'),
-		css:'red',
-		price:function(){
-                                  //      console.log(this)
-			return this.css;
-		},
-                                y:'wsww'
+                		age:mvvm.observable(1111),
+                		css:mvvm.observable('red'),
+                		price:'<span class="red">$1111</span>',
+                        married:mvvm.observable(true),
+                        changeColor:mvvm.observable('red')
                     }
 
                 mvvm.applyBindings(o,document.getElementById('content'))
 			
-	document.getElementById('myBtn').onclick = function(){
-		o.age(this.value);
-	}
-	
-        var sayHi = new Function("sName", "sMessage", "alert(\"Hello \" + sName + sMessage);");
-
-            var y
-            with(o){
-                var y = 100;
-                /*y = {
-                    text:price()
-                }*/
-             //   console.log(y, o)
-            }
-            
-        
-       // var vm = {};
-       // new Function('vm','var attrObj ;with(window){attrObj = {}};return attrObj;')
-
-        })
-
-
-    // price();
-//o.firstName('11')
+            	document.getElementById('myBtn').onclick = function(){
+            		o.age(this.value);
+                    o.css('green');
+                    o.married(false);
+            	}
+	       })
+       
     </script>
 </head>
 <body>
 <p>First name: <strong data-bind="text:firstName ">todo</strong></p>
 <div id="content">
-	<p>price: <strong data-bind="text:this.price()">todo</strong></p>
+	<p>price: <strong data-bind="html:price">todo</strong></p>
 	<p>First name: <strong data-bind="text:firstName">todo</strong></p>
-    <p>Last name: <strong data-bind="css:css,text:lastName">todo</strong></p>
+    <p>Last name: <strong data-bind="css:css,text:lastName" class="hha">todo</strong></p>
 	<p>Age: <strong data-bind="text:age ">todo</strong></p>
 	<p>Age: <span data-bind="text:age ">todo</span></p>
+    <p>sex: <span data-bind="visible:married">femail</span></p>
+    <p>style: <span data-bind="style:{color:changeColor(),fontWeight:'bold',opacity:0.2}">
+        哈哈，汉子也不乱码</span></p>
+    <p>attr: <span data-bind="attr:{name:'hello'}">属性</span></p>
     <p><input type="button" value="changeTo123" id="myBtn"/></p>
 </div>
 
