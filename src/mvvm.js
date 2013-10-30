@@ -140,7 +140,7 @@
 			var _currentDom = [],
 				_random = [],
 				_objectKey;
-			return function mvvmQQ529130510(newVal,currentDom,random,bindLast){
+			function mvvmQQ529130510(newVal,currentDom,random,bindLast){
 				if(currentDom){
 					_currentDom.push(currentDom)
 				}
@@ -162,11 +162,14 @@
 					}else{
 						observableVal = valSet;
 					}
+
 					pubsub.publish(_random[i],[observableVal,_currentDom[i]]);
 				}
 
 				return observableVal;
 			}
+			mvvmQQ529130510.name = observableFunctionName;
+			return mvvmQQ529130510
 		}   
 		
 
@@ -181,6 +184,7 @@
 			pubsub.subscribe(random,observableFunc);
 			//var attrCache = data(dom,dataCache[attr]);
 
+			//console.log(dataKey)
 			//设置当前观察者 是否监控一个对象
 			if(dataKey){
 				var _dataAttr = {};
@@ -278,6 +282,7 @@
 					//console.log(type)
 					switch(type){
 						case 'Function':
+							//console.log(vmValue.name)
 							if(vmValue.name === observableFunctionName){
 								pushPubSub(currentDom,bindKey,currentFn,vmValue)
 							}
@@ -323,10 +328,35 @@
 
 		//style
 		function routeStyleFn(ary){
+			//console.log(11)
 			var dom = ary[1],
-			styleObj = ary[0];
+				styleObj = ary[0],
+				attrKey,
+				attrVal,
+				attrObjType = utils.getType(styleObj),
+				copyStyleObj = {};
+			
+			if(attrObjType === 'Object'){
+				for(attrKey in styleObj){
+					attrVal = styleObj[attrKey];
+					if(utils.getType(attrVal) === 'Function'){
+						if(attrVal.name === observableFunctionName){
+							attrVal = pushPubSub(dom,'attr',routeStyleFn,attrVal,attrKey);
+							utils.extend(copyStyleObj,attrVal);
+						} 
+					}else{
+						copyStyleObj[attrKey] = styleObj[attrKey]
+					}
+				}
+				//console.log(copyStyleObj)
+				style.set(dom,copyStyleObj);
+			}
 
-			style.set(dom,styleObj);
+
+			//var dom = ary[1],
+			//styleObj = ary[0];
+
+			//style.set(dom,styleObj);
 		}
 
 		//attr
@@ -345,6 +375,7 @@
 							attrVal = pushPubSub(dom,'attr',routeAttrFn,attrVal,attrKey)
 						}
 					}
+					//console.log(attrVal)
 					dom.setAttribute(attrKey,attrVal);
 				}
 			}
@@ -367,7 +398,7 @@
 			}else if(dom.innerText){
 				dom.innerText = text;
 			}
-			//console.log(data(dom,dataCache.text));
+
 		}
 		
 		function setClassName(dom,className){
@@ -393,9 +424,7 @@
 		}
 
 		//############################################################
-		
 
-		//#################################################
 		return mvvm;
 	})
 })()

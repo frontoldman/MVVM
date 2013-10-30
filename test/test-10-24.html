@@ -36,7 +36,8 @@
                 	       o.age(this.value);
                                o.css('green');
                                o.married(false);
-                               o.url('22')
+                               o.url('22');
+                               o.changeColor('#0f0')
                 	}
 	       })
        
@@ -45,16 +46,16 @@
 <body>
 <p>First name: <strong data-bind="text:firstName ">todo</strong></p>
 <div id="content">
-	<p>price: <strong data-bind="html:price">todo</strong></p>
+<!-- 	<p>price: <strong data-bind="html:price">todo</strong></p>
 	<p>First name: <strong data-bind="text:firstName">todo</strong></p>
     <p>Last name: <strong data-bind="css:css,text:lastName" class="hha">todo</strong></p>
 	<p>Age: <strong data-bind="text:age ">todo</strong></p>
 	<p>Age: <span data-bind="text:age ">todo</span></p>
-    <p>sex: <span data-bind="visible:married">femail</span></p>
+    <p>sex: <span data-bind="visible:married">femail</span></p> -->
     <p>style: <span data-bind="style:{color:changeColor,fontWeight:'bold',opacity:0.2}">
         哈哈，汉子也不乱码</span></p>
-    <p>attr: <span data-bind="attr:{name:'hello'}">属性</span></p>
-    <p>attr: <a data-bind="attr:{href:url,name:firstName},text:url">属性</a></p>
+  <!--   <p>attr: <span data-bind="attr:{name:'hello'}">属性</span></p>
+    <p>attr: <a data-bind="attr:{href:url,name:firstName},text:url">属性</a></p> -->
     <p><input type="button" value="changeTo123" id="myBtn"/></p>
 </div>
 
