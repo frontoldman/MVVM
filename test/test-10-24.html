@@ -27,7 +27,8 @@
                         price:'<span class="red">$1111</span>',
                         married:mvvm.observable(true),
                         changeColor:mvvm.observable('red'),
-                        url:mvvm.observable('http://www.baidu.com')
+                        url:mvvm.observable('http://www.baidu.com'),
+                        people:[]
                     }
 
                 mvvm.applyBindings(o,document.getElementById('content'))
@@ -54,6 +55,12 @@
     <p>sex: <span data-bind="visible:married">femail</span></p> -->
     <p>style: <span data-bind="style:{color:changeColor,fontWeight:'bold',opacity:0.2}">
         哈哈，汉子也不乱码</span></p>
+    <p data-bind="forEach:people">
+        <span data-bind="text:$this"></span>
+    </p>
+    <p>
+        内部：<span data-bind="text:firstName"></span>
+    </p>
   <!--   <p>attr: <span data-bind="attr:{name:'hello'}">属性</span></p>
     <p>attr: <a data-bind="attr:{href:url,name:firstName},text:url">属性</a></p> -->
     <p><input type="button" value="changeTo123" id="myBtn"/></p>

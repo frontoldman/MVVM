@@ -7,7 +7,12 @@
 		url_prefix+'sizzle/sizzle',
 		url_prefix+'style/style',
 		'../lib/utils/utils'],function(data,animate,events,domReady,sizzle,style,utils){
-		
+
+        // For details, see http://stackoverflow.com/questions/14119988/return-this-0-evalthis/14120023#14120023
+        var window = this || (0,eval)('this'),
+            document = window.document;
+
+
 		//扩展方法
 		//from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind
 		if (!Function.prototype.bind) {
@@ -47,6 +52,12 @@
 		    };
 		}
 
+        //from http://www.cnblogs.com/rubylouvre/archive/2011/05/30/1583523.html
+        if(!!window.find){
+            HTMLElement.prototype.contains = function(B){
+                return this.compareDocumentPosition(B) - 19 > 0
+            }
+        }
 		//################################################
 		var mvvm = {}
 		//全局配置
@@ -59,9 +70,7 @@
 		})
 
 		var observableFunctionName = 'mvvmQQ529130510';
-		// For details, see http://stackoverflow.com/questions/14119988/return-this-0-evalthis/14120023#14120023
-		var window = this || (0,eval)('this'),
-		document = window.document;
+
 
 		//一个简单的观察者
 		//For details, see http://www.cnblogs.com/tomxu/archive/2012/03/02/2355128.html
@@ -130,6 +139,7 @@
 				}
 				
 				var domsAndAttrs = getTriggerDoms(rootNode);
+                console.log(domsAndAttrs)
 				analysisBindRulers(vm,domsAndAttrs);
 			})
 		}
@@ -200,32 +210,61 @@
 		/*
 		取得所有符合条件节点
 		 */
-		function getTriggerDoms(rootNode){
-			//return sizzle('*['+ mvvm.trigger +']',rootNode)
-			var domLocateds = rootNode.getElementsByTagName('*'),
-				i = 0,
-				len = domLocateds.length,
-				domAttrName,
-				dataBindDomLists = [],
-				currentDom;
-			for(;i<len;i++){
-				currentDom = domLocateds[i];
-				domAttrName = currentDom.getAttribute(mvvm.trigger);
-				if(domAttrName == undefined){
-					domAttrName = currentDom[mvvm.trigger];
-				}
-				
-				if( domAttrName != undefined) {
-					domAttrName = utils.trim(domAttrName);
-					dataBindDomLists.push({
-						dom:currentDom,
-						attr:domAttrName
-					});
-				}
-			}
-			domLocateds = null;
-			return dataBindDomLists;
-		}
+        var controlFlowElementsPattern = /with|forEach|if|ifnot/;
+        function getTriggerDoms(rootNode,elementsList){
+            var children =  rootNode.children,
+                index = 0,
+                len = children.length,
+                attrVal,
+                currentDom,
+                dataBindElements = utils.getType(elementsList) === 'Array' ? elementsList : [];
+            //console.log(children)
+            for(;index<len;index++){
+                currentDom = children[index];
+                attrVal =  currentDom.getAttribute(mvvm.trigger);
+                if(attrVal === undefined){
+                    attrVal = currentDom[mvvm.trigger];
+                }
+
+                if(attrVal){
+                    attrVal = utils.trim(attrVal);
+                    dataBindElements.push({
+                        dom:currentDom,
+						attr:attrVal
+                    });
+                }
+                if(!controlFlowElementsPattern.test(attrVal)){
+                    getTriggerDoms(currentDom,dataBindElements);
+                }
+            }
+            return dataBindElements;
+        }
+//		function getTriggerDoms(rootNode){
+//			//return sizzle('*['+ mvvm.trigger +']',rootNode)
+//			var domLocateds = rootNode.getElementsByTagName('*'),
+//				i = 0,
+//				len = domLocateds.length,
+//				domAttrName,
+//				dataBindDomLists = [],
+//				currentDom;
+//			for(;i<len;i++){
+//				currentDom = domLocateds[i];
+//				domAttrName = currentDom.getAttribute(mvvm.trigger);
+//				if(domAttrName == undefined){
+//					domAttrName = currentDom[mvvm.trigger];
+//				}
+//
+//				if( domAttrName != undefined) {
+//					domAttrName = utils.trim(domAttrName);
+//					dataBindDomLists.push({
+//						dom:currentDom,
+//						attr:domAttrName
+//					});
+//				}
+//			}
+//			domLocateds = null;
+//			return dataBindDomLists;
+//		}
 		
 		
 		var bindRoute = {
@@ -272,7 +311,7 @@
 				}
 				
 				attrsValueObject = _fn.bind(vm)(vm);
-				//console.log(attrsValueObject)
+				console.log(attrsValueObject)
 				//console.log(vm)
 				for(bindKey in attrsValueObject){
 					vmValue = attrsValueObject[bindKey];
@@ -280,6 +319,8 @@
 					currentFn = bindRoute[bindKey] ? bindRoute[bindKey]
 									: function(){};
 					//console.log(type)
+                    console.log(currentFn)
+                    console.log(currentDom)
 					switch(type){
 						case 'Function':
 							//console.log(vmValue.name)
