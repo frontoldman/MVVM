@@ -28,17 +28,17 @@
                         married:mvvm.observable(true),
                         changeColor:mvvm.observable('red'),
                         url:mvvm.observable('http://www.baidu.com'),
-                        people:[]
+                        people:['hello','nani']
                     }
 
                 mvvm.applyBindings(o,document.getElementById('content'))
 			
                 	document.getElementById('myBtn').onclick = function(){
                 	       o.age(this.value);
-                               o.css('green');
-                               o.married(false);
-                               o.url('22');
-                               o.changeColor('#0f0')
+                           o.css('green');
+                           o.married(false);
+                           o.url('22');
+                           o.changeColor('#0f0')
                 	}
 	       })
        
@@ -55,8 +55,8 @@
     <p>sex: <span data-bind="visible:married">femail</span></p> -->
     <p>style: <span data-bind="style:{color:changeColor,fontWeight:'bold',opacity:0.2}">
         哈哈，汉子也不乱码</span></p>
-    <p data-bind="forEach:people">
-        <span data-bind="text:$this"></span>
+    <p data-bind="foreach:people">
+        foreach:<span data-bind="text:$data"></span>
     </p>
     <p>
         内部：<span data-bind="text:firstName"></span>

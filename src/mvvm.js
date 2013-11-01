@@ -139,7 +139,6 @@
 				}
 				
 				var domsAndAttrs = getTriggerDoms(rootNode);
-                console.log(domsAndAttrs)
 				analysisBindRulers(vm,domsAndAttrs);
 			})
 		}
@@ -210,7 +209,7 @@
 		/*
 		取得所有符合条件节点
 		 */
-        var controlFlowElementsPattern = /with|forEach|if|ifnot/;
+        var controlFlowElementsPattern = /with|foreach|if|ifnot/;
         function getTriggerDoms(rootNode,elementsList){
             var children =  rootNode.children,
                 index = 0,
@@ -239,32 +238,7 @@
             }
             return dataBindElements;
         }
-//		function getTriggerDoms(rootNode){
-//			//return sizzle('*['+ mvvm.trigger +']',rootNode)
-//			var domLocateds = rootNode.getElementsByTagName('*'),
-//				i = 0,
-//				len = domLocateds.length,
-//				domAttrName,
-//				dataBindDomLists = [],
-//				currentDom;
-//			for(;i<len;i++){
-//				currentDom = domLocateds[i];
-//				domAttrName = currentDom.getAttribute(mvvm.trigger);
-//				if(domAttrName == undefined){
-//					domAttrName = currentDom[mvvm.trigger];
-//				}
-//
-//				if( domAttrName != undefined) {
-//					domAttrName = utils.trim(domAttrName);
-//					dataBindDomLists.push({
-//						dom:currentDom,
-//						attr:domAttrName
-//					});
-//				}
-//			}
-//			domLocateds = null;
-//			return dataBindDomLists;
-//		}
+
 		
 		
 		var bindRoute = {
@@ -273,7 +247,8 @@
 			html:routeHtmlFn,
 			visible:routeVisibleFn,
 			style:routeStyleFn,
-			attr:routeAttrFn
+			attr:routeAttrFn,
+			foreach:routeForeachFn
 		}
 		
 		
@@ -301,7 +276,7 @@
 			for(;i<len;i++){
 				currentDom = domsAndAttrs[i].dom;
 				currentAttr = domsAndAttrs[i].attr;
-			
+				console.log(currentAttr)
 				//varStr = convertVariableScope(vm);
 				
 				try{
@@ -311,7 +286,7 @@
 				}
 				
 				attrsValueObject = _fn.bind(vm)(vm);
-				console.log(attrsValueObject)
+				//console.log(attrsValueObject)
 				//console.log(vm)
 				for(bindKey in attrsValueObject){
 					vmValue = attrsValueObject[bindKey];
@@ -319,17 +294,18 @@
 					currentFn = bindRoute[bindKey] ? bindRoute[bindKey]
 									: function(){};
 					//console.log(type)
-                    console.log(currentFn)
-                    console.log(currentDom)
+                    //console.log(currentFn)
+                    //console.log(currentDom)
 					switch(type){
 						case 'Function':
-							//console.log(vmValue.name)
+
 							if(vmValue.name === observableFunctionName){
 								pushPubSub(currentDom,bindKey,currentFn,vmValue)
 							}
 							break;
 						default:
-							currentFn([vmValue,currentDom]);
+
+							currentFn([vmValue,currentDom,vm]);
 							break;
 					}
 				}	
@@ -389,15 +365,14 @@
 						copyStyleObj[attrKey] = styleObj[attrKey]
 					}
 				}
-				//console.log(copyStyleObj)
+
 				style.set(dom,copyStyleObj);
 			}
 
 
-			//var dom = ary[1],
-			//styleObj = ary[0];
+	
 
-			//style.set(dom,styleObj);
+
 		}
 
 		//attr
@@ -421,6 +396,26 @@
 				}
 			}
 		}
+
+		function routeForeachFn(ary){
+			var dom = ary[1],
+				foreachObj = ary[0],
+				context = ary[2],
+				listDomTemplete ,
+				innerHtml = dom.innerHTML;
+
+
+			dom.innerHTML = '';
+			foreachObj.forEach(function(val,key){
+				listDomTemplete = document.createDocumentFragment();
+				listDomTemplete.innerHTML = innerHtml;
+				console.log(innerHtml)
+				console.log(listDomTemplete)
+				dom.appendChild(listDomTemplete);
+			})
+
+		}
+
 		//################################
 		//常用方法
 		function getRandom(){
@@ -433,7 +428,7 @@
 		//############################################################
 		//dom操作的常用方法
 		function setText(dom,text){
-
+			dom.innerHTML = '&nbsp;';
 			if(dom.textContent){
 				dom.textContent = text;
 			}else if(dom.innerText){
