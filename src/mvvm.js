@@ -220,11 +220,8 @@
             //console.log(children)
             for(;index<len;index++){
                 currentDom = children[index];
-                attrVal =  currentDom.getAttribute(mvvm.trigger);
-                if(attrVal === undefined){
-                    attrVal = currentDom[mvvm.trigger];
-                }
-
+                
+                attrVal = getAttribute(currentDom)
                 if(attrVal){
                     attrVal = utils.trim(attrVal);
                     dataBindElements.push({
@@ -276,16 +273,8 @@
 			for(;i<len;i++){
 				currentDom = domsAndAttrs[i].dom;
 				currentAttr = domsAndAttrs[i].attr;
-				console.log(currentAttr)
-				//varStr = convertVariableScope(vm);
 				
-				try{
-					_fn = new Function('scope','var attrObj ;with( scope ){attrObj = {'+ currentAttr +'}};return attrObj;')
-				}catch(e){
-					throw 'Error expressions!';
-				}
-				
-				attrsValueObject = _fn.bind(vm)(vm);
+				attrsValueObject = getAttrsValueObject(currentAttr,vm);
 				//console.log(attrsValueObject)
 				//console.log(vm)
 				for(bindKey in attrsValueObject){
@@ -310,6 +299,7 @@
 					}
 				}	
 			}
+			return domsAndAttrs;
 		}
 		
 		 
@@ -397,6 +387,11 @@
 			}
 		}
 
+		/**
+			dom
+			data
+			data.$parent
+		*/
 		function routeForeachFn(ary){
 			var dom = ary[1],
 				foreachObj = ary[0],
@@ -404,15 +399,56 @@
 				listDomTemplete ,
 				innerHtml = dom.innerHTML;
 
+	
+
+			var childNodes = getChildNodes(dom);
 
 			dom.innerHTML = '';
-			foreachObj.forEach(function(val,key){
-				listDomTemplete = document.createDocumentFragment();
-				listDomTemplete.innerHTML = innerHtml;
-				console.log(innerHtml)
-				console.log(listDomTemplete)
-				dom.appendChild(listDomTemplete);
+			foreachObj.forEach(function(objVal,objKey){
+				fillContext(childNodes,objVal,objKey);
 			})
+
+			//区分child nodeType的路由
+			function fillContext(childNodes,objVal,objKey){
+				var childNodeAttr,
+					childAttrObj,
+					objValType = utils.getType(objVal),
+					newObjVal;
+
+				newObjVal = {
+					$data:objVal,
+					$index:objKey,
+					$parent:context
+				}
+				
+				utils.extend(newObjVal,objVal);
+
+				childNodes.forEach(function(childNode,childKey){
+					console.log(childNode.nodeType);
+					//return;
+					childNode.cloneNode(true);
+					//return;
+					var newChildNode = childNode.cloneNode(true);
+					//return;
+					var	newDomAry;
+						//return;
+					switch(childNode.nodeType){
+						//元素节点
+						case 1:
+							childNodeAttrs = getAttribute(newChildNode);
+							if(childNodeAttrs){
+								analysisBindRulers(newObjVal,[{
+									dom:newChildNode,
+									attr:childNodeAttrs
+								}])
+							}
+							break;
+						default:
+							break;
+					}
+					dom.appendChild(newChildNode);
+				})
+			}
 
 		}
 
@@ -422,11 +458,34 @@
 			return Math.random();
 		}
 
-		
+		//解析data-bind,修正this指向
+		function getAttrsValueObject(currentAttr,viewModel){
+			var _fn,attrValueObject;
+			try{
+				_fn = new Function('scope','var attrObj ;with( scope ){attrObj = {'+ currentAttr +'}};return attrObj;')
+			}catch(e){
+				throw 'Error expressions!';
+			}
 
+			try{
+				attrValueObject = _fn.bind(viewModel)(viewModel);
+			}catch(e){
+				attrValueObject = {};
+			}
+			return attrValueObject;
+		}
 
 		//############################################################
 		//dom操作的常用方法
+		function getAttribute(currentDom){
+			var attrVal =  currentDom.getAttribute(mvvm.trigger);
+            if(attrVal === undefined){
+                attrVal = currentDom[mvvm.trigger];
+            }
+            return attrVal ? attrVal : null;
+		}
+
+
 		function setText(dom,text){
 			dom.innerHTML = '&nbsp;';
 			if(dom.textContent){
@@ -457,6 +516,10 @@
 
 		function setAttr(){
 
+		}
+
+		function getChildNodes(parent){
+			return utils.makeArray(parent.childNodes)
 		}
 
 		//############################################################
