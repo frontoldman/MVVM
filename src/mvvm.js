@@ -65,7 +65,7 @@
 
 		var dataCache = {};
 
-		'css visible attr text html style'.split(' ').forEach(function(val,key){
+		'css visible attr text html style ifAndIfnot'.split(' ').forEach(function(val,key){
 			dataCache[val] = 'mvvm-' + val;
 		})
 
@@ -209,7 +209,7 @@
 		/*
 		取得所有符合条件节点
 		 */
-		var controlFlowElementsPattern = /with|foreach|if|ifnot/;
+		var controlFlowElementsPattern = /with|foreach/;
 		function getTriggerDoms(rootNode,elementsList){
 		    var children =  rootNode.children,
 		        index = 0,
@@ -244,7 +244,9 @@
 			visible:routeVisibleFn,
 			style:routeStyleFn,
 			attr:routeAttrFn,
-			foreach:routeForeachFn
+			foreach:routeForeachFn,
+			'if':routeIfFn,
+			'ifnot':routeIfnotFn
 		}
 		
 		
@@ -449,6 +451,37 @@
 
 		}
 
+		//if路由
+		function routeIfFn(ary){
+			var dom = ary[1],
+				isTrue = ary[0],
+				cache ;
+
+			setIfAndIfNotCache(dom)
+			cache = data(dom,dataCache.ifAndIfnot);
+
+			if(isTrue){
+				dom.innerHTML = cache ? cache : '';
+			}else{
+				dom.innerHTML = '';
+			}
+		}
+
+		//ifnot
+		function routeIfnotFn(ary){
+			var dom = ary[1],
+				isTrue = ary[0],
+				cache ;
+
+			setIfAndIfNotCache(dom)
+			cache = data(dom,dataCache.ifAndIfnot);
+
+			if(isTrue){
+				dom.innerHTML = '';
+			}else{
+				dom.innerHTML = cache ? cache : '';
+			}
+		}
 		//################################
 		//常用方法
 		function getRandom(){
@@ -456,8 +489,13 @@
 		}
 
 		//解析data-bind,修正this指向
+		var faultPattern = /(if|with)\s*:/g
 		function getAttrsValueObject(currentAttr,viewModel){
 			var _fn,attrValueObject;
+			//处理if|with关键字作为键值在ie6下面报错的问题
+			currentAttr = currentAttr.replace(faultPattern,function($1,$2){
+				return "'" + $2 + "'" + ":"
+			});
 			try{
 				_fn = new Function('scope','var attrObj ;with( scope ){attrObj = {'+ currentAttr +'}};return attrObj;')
 			}catch(e){
@@ -519,6 +557,12 @@
 			return utils.makeArray(parent.childNodes)
 		}
 
+		function setIfAndIfNotCache(dom){
+			var originHtml = dom.innerHTML;
+			if(originHtml.length){
+				data(dom,dataCache.ifAndIfnot,originHtml);
+			}
+		}
 		//############################################################
 
 		return mvvm;

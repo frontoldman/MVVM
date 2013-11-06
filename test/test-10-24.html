@@ -31,17 +31,20 @@
                         people:[
                             {firstName:'lily',lastName:'haha'},
                             {firstName:'苍',lastName:'井空'}
-                        ]
+                        ],
+                        amount:mvvm.observable('true')
                     }
 
                 mvvm.applyBindings(o,document.getElementById('content'))
-			
+			         var amount = true;
                 	document.getElementById('myBtn').onclick = function(){
                 	       o.age(this.value);
                            o.css('green');
                            o.married(false);
                            o.url('22');
-                           o.changeColor('#0f0')
+                           o.changeColor('#0f0'); 
+                           amount = !amount;
+                           o.amount(amount);
                 	}
 	       })
        
@@ -70,6 +73,8 @@
     <p>
         内部：<span data-bind="text:firstName"></span>
     </p>
+    <p data-bind="if:amount">if</p>
+    <p data-bind="ifnot:amount">not</p>
   <!--   <p>attr: <span data-bind="attr:{name:'hello'}">属性</span></p>
     <p>attr: <a data-bind="attr:{href:url,name:firstName},text:url">属性</a></p> -->
     <p><input type="button" value="changeTo123" id="myBtn"/></p>
