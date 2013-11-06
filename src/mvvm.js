@@ -209,32 +209,31 @@
 		/*
 		取得所有符合条件节点
 		 */
-        var controlFlowElementsPattern = /with|foreach|if|ifnot/;
-        function getTriggerDoms(rootNode,elementsList){
-            var children =  rootNode.children,
-                index = 0,
-                len = children.length,
-                attrVal,
-                currentDom,
-                dataBindElements = utils.getType(elementsList) === 'Array' ? elementsList : [];
-            //console.log(children)
-            for(;index<len;index++){
-                currentDom = children[index];
-                
-                attrVal = getAttribute(currentDom)
-                if(attrVal){
-                    attrVal = utils.trim(attrVal);
-                    dataBindElements.push({
-                        dom:currentDom,
+		var controlFlowElementsPattern = /with|foreach|if|ifnot/;
+		function getTriggerDoms(rootNode,elementsList){
+		    var children =  rootNode.children,
+		        index = 0,
+		        len = children.length,
+		        attrVal,
+		        currentDom,
+		        dataBindElements = utils.getType(elementsList) === 'Array' ? elementsList : [];
+		    for(;index<len;index++){
+		        currentDom = children[index];
+		        
+		        attrVal = getAttribute(currentDom)
+		        if(attrVal){
+		            attrVal = utils.trim(attrVal);
+		            dataBindElements.push({
+		                dom:currentDom,
 						attr:attrVal
-                    });
-                }
-                if(!controlFlowElementsPattern.test(attrVal)){
-                    getTriggerDoms(currentDom,dataBindElements);
-                }
-            }
-            return dataBindElements;
-        }
+		            });
+		        }
+		        if(!controlFlowElementsPattern.test(attrVal)){
+		            getTriggerDoms(currentDom,dataBindElements);
+		        }
+		    }
+		    return dataBindElements;
+		}
 
 		
 		
@@ -401,19 +400,22 @@
 
 	
 
-			var childNodes = getChildNodes(dom);
+			var childNodes = getChildNodes(dom),
+			fragment = document.createDocumentFragment();
 
-			dom.innerHTML = '';
+			//dom.innerHTML = '';
 			foreachObj.forEach(function(objVal,objKey){
 				fillContext(childNodes,objVal,objKey);
 			})
-
+			dom.innerHTML = '';
+			dom.appendChild(fragment);
 			//区分child nodeType的路由
 			function fillContext(childNodes,objVal,objKey){
 				var childNodeAttr,
 					childAttrObj,
 					objValType = utils.getType(objVal),
-					newObjVal;
+					newObjVal,
+					newElementsList ;
 
 				newObjVal = {
 					$data:objVal,
@@ -424,30 +426,29 @@
 				utils.extend(newObjVal,objVal);
 
 				childNodes.forEach(function(childNode,childKey){
-					console.log(childNode.nodeType);
-					//return;
-					childNode.cloneNode(true);
-					//return;
 					var newChildNode = childNode.cloneNode(true);
-					//return;
-					var	newDomAry;
-						//return;
+					var newDomAry;
 					switch(childNode.nodeType){
 						//元素节点
 						case 1:
 							childNodeAttrs = getAttribute(newChildNode);
-							if(childNodeAttrs){
-								analysisBindRulers(newObjVal,[{
-									dom:newChildNode,
-									attr:childNodeAttrs
-								}])
+							newElementsList =  getTriggerDoms(newChildNode);
+							if(childNodeAttrs || newElementsList.length){
+								if(childNodeAttrs){
+									newElementsList.push({
+										dom:newChildNode,
+										attr:childNodeAttrs
+									})	
+								}
+								analysisBindRulers(newObjVal,newElementsList)
 							}
 							break;
 						default:
 							break;
 					}
-					dom.appendChild(newChildNode);
+					fragment.appendChild(newChildNode);
 				})
+				
 			}
 
 		}
@@ -479,10 +480,10 @@
 		//dom操作的常用方法
 		function getAttribute(currentDom){
 			var attrVal =  currentDom.getAttribute(mvvm.trigger);
-            if(attrVal === undefined){
-                attrVal = currentDom[mvvm.trigger];
-            }
-            return attrVal ? attrVal : null;
+			if(attrVal === undefined){
+			    attrVal = currentDom[mvvm.trigger];
+			}
+			return attrVal ? attrVal : null;
 		}
 
 

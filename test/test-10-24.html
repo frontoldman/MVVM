@@ -58,11 +58,15 @@
     <p>sex: <span data-bind="visible:married">femail</span></p> -->
     <p>style: <span data-bind="style:{color:changeColor,fontWeight:'bold',opacity:0.2}">
         哈哈，汉子也不乱码</span></p>
-    <p data-bind="foreach:people"><strong data-bind="text:firstName"></strong>:
+    <div data-bind="foreach:people">
+        <p>
+            <strong data-bind="text:firstName">asdasd</strong>:
+        </p>
+        <strong data-bind="text:firstName"></strong>:
         <span data-bind="text:lastName"></span>
         <span data-bind="html:$parent.price"></span>
         <br/>
-    </p>
+    </div>
     <p>
         内部：<span data-bind="text:firstName"></span>
     </p>
