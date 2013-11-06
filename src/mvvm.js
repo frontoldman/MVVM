@@ -358,10 +358,6 @@
 				style.set(dom,copyStyleObj);
 			}
 
-
-	
-
-
 		}
 
 		//attr
