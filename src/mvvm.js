@@ -206,15 +206,69 @@
 					_random.push(random);
 					return changedArray;
 				},
-				push:function(val){
-					publish(function(currentDom){
-						var fragment = fillContext(currentDom.inner,val,changedArray.length,currentDom.context,null,currentDom.wapper);
-						currentDom.wapper.appendChild(fragment);
-					})
-					changedArray.push(val)
+				push:function(){
+					var i = 0,
+						len = arguments.length,
+						val;
+					for(;i<len;i++){
+						val = arguments[i];
+						publish(function(currentDom){
+							var fragment = fillContext(currentDom.inner,val,changedArray.length,currentDom.context,null,currentDom.wapper);
+							currentDom.wapper.appendChild(fragment);
+							//console.log(data(currentDom.wapper,dataCache['foreach']));
+						})
+						changedArray.push(val);
+					}
+					return changedArray.length;
+				},
+				unshift:function(){
+					var i = 0,
+						len = arguments.length,
+						val;
+					for(;i<len;i++){
+						val = arguments[i];
+						publish(function(currentDom){
+							var fragment = fillContext(currentDom.inner,val,len-i-1,currentDom.context,null,currentDom.wapper);
+							currentDom.wapper.insertBefore(fragment,currentDom.wapper.firstChild);
+						})
+						changedArray.push(val);
+					}
+					return changedArray.length;
 				},
 				pop:function(){
-					
+					publish(function(currentDom){
+						var childNodesCache = data(currentDom.wapper,dataCache['foreach']);
+						var lastChildNodes = childNodesCache.pop();
+						if(utils.getType(lastChildNodes) == 'Array'){
+							lastChildNodes.forEach(function(val){
+								currentDom.wapper.removeChild(val);
+							})
+						}
+					})
+					return changedArray.pop()
+				},
+				shift:function(){
+					publish(function(currentDom){
+						var childNodesCache = data(currentDom.wapper,dataCache['foreach']);
+						var lastChildNodes = childNodesCache.shift();
+						if(utils.getType(lastChildNodes) == 'Array'){
+							lastChildNodes.forEach(function(val){
+								currentDom.wapper.removeChild(val);
+							})
+						}
+					})
+					return changedArray.shift()
+				},
+				splice:function(){
+					var index = arguments[0]*1,
+						howmany = arguments[1]*1,
+						len = arguments.length,
+						i = 2;
+
+					index = index<0 ? changedArray.length - 1 - howmany : index ;
+					for(;i<len;i++){
+						
+					}
 				}
 			}
 		}
@@ -440,7 +494,13 @@
 			var childNodes = getChildNodes(dom),
 				fragment = document.createDocumentFragment();
 
-			//data(dom,dataCache[val],childNodes);
+			//解决ie当节点从页面通过innerHTML清空，则无法操作节点
+			childNodes.forEach(function(node){
+				dom.removeChild(node);
+			});
+
+			//当前childNode存储到缓存里面去
+			data(dom,dataCache['foreach'],[]);
 			switch(type){
 				case 'Object':
 					realForeachObj = foreachObj.initVal({
@@ -456,9 +516,9 @@
 
 			//dom.innerHTML = '';
 			realForeachObj.forEach(function(objVal,objKey){
-				fillContext(childNodes,objVal,objKey,context,fragment);
+				fillContext(childNodes,objVal,objKey,context,fragment,dom);
 			})
-			dom.innerHTML = '';
+			//dom.innerHTML = '';
 			dom.appendChild(fragment);
 			
 		}
@@ -553,9 +613,13 @@
 				childAttrObj,
 				objValType = utils.getType(objVal),
 				newObjVal,
-				newElementsList;
+				newElementsList,
+				childNodesCache = data(parentNode,dataCache['foreach']),
+				_currentChildNodes = [];
 
-			newObjVal = {
+			childNodesCache = childNodesCache ? childNodesCache : [] ;
+
+			newObjVal = { 
 				$data:objVal,
 				$index:objKey,
 				$parent:context
@@ -567,8 +631,9 @@
 			childNodes.forEach(function(childNode,childKey){
 				var newChildNode;
 				newChildNode = childNode.cloneNode(true);
+				
 				//更新原始节点，因为ie操作无法操作原始节点
-				childNodes[childKey] = newChildNode;
+				//childNodes[childKey] = newChildNode;
 				var newDomAry;
 				switch(childNode.nodeType){
 					//元素节点
@@ -588,8 +653,10 @@
 					default:
 						break;
 				}
+				_currentChildNodes.push(newChildNode);
 				fragment.appendChild(newChildNode);
 			})
+			childNodesCache.push(_currentChildNodes);
 			return fragment;
 		}
 

@@ -52,8 +52,24 @@
                            amount = !amount;
                            o.amount(amount);
                            o.info.howFar(20000);
-                           o.phones.push('三星');
+                           o.phones.push('三星','西门子');
                 	}
+
+                    document.getElementById('delBtn').onclick = function(){
+                        o.phones.pop();
+                    }
+
+                    document.getElementById('shiftBtn').onclick = function(){
+                        o.phones.shift();
+                    }
+
+                    document.getElementById('unshiftBtn').onclick = function(){
+                        o.phones.unshift('三星','西门子');
+                    }
+
+                    document.getElementById('spliceBtn').onclick = function(){
+                        o.phones.splice(-1,0);
+                    }
 	       })
        
     </script>
@@ -105,6 +121,10 @@
   <!--   <p>attr: <span data-bind="attr:{name:'hello'}">属性</span></p>
     <p>attr: <a data-bind="attr:{href:url,name:firstName},text:url">属性</a></p> -->
     <p><input type="button" value="changeTo123" id="myBtn"/></p>
+    <p><input type="button" value="pop" id="delBtn"/></p>
+    <p><input type="button" value="shift" id="shiftBtn"/></p>
+    <p><input type="button" value="unshift" id="unshiftBtn"/></p>
+    <p><input type="button" value="splice" id="spliceBtn"/></p>
 </div>
 
 
