@@ -18,6 +18,7 @@
 
         require('../src/mvvm',function(mvvm){
 
+            var phone = ['iPhone','HTC','XIAOMI']
 
             window.o = {
                         firstName:'li',
@@ -29,10 +30,15 @@
                         changeColor:mvvm.observable('red'),
                         url:mvvm.observable('http://www.baidu.com'),
                         people:[
-                            {firstName:'lily',lastName:'haha'},
+                            {firstName:'lily',lastName:mvvm.observable('hahahahhehe')},
                             {firstName:'苍',lastName:'井空'}
                         ],
-                        amount:mvvm.observable('true')
+                        amount:mvvm.observable('true'),
+                        info:{
+                            country:'china',
+                            howFar:mvvm.observable(1000)
+                        },
+                        phones:mvvm.observableArray(phone)
                     }
 
                 mvvm.applyBindings(o,document.getElementById('content'))
@@ -45,6 +51,8 @@
                            o.changeColor('#0f0'); 
                            amount = !amount;
                            o.amount(amount);
+                           o.info.howFar(20000);
+                           o.phones.push('三星');
                 	}
 	       })
        
@@ -62,6 +70,7 @@
     <p>style: <span data-bind="style:{color:changeColor,fontWeight:'bold',opacity:0.2}">
         哈哈，汉子也不乱码</span></p>
     <div data-bind="foreach:people">
+
         <p>
             <strong data-bind="text:firstName">asdasd</strong>:
         </p>
@@ -70,11 +79,29 @@
         <span data-bind="html:$parent.price"></span>
         <br/>
     </div>
+
     <p>
         内部：<span data-bind="text:firstName"></span>
     </p>
-    <p data-bind="if:amount">if</p>
+    <p data-bind="if:amount">
+        if:<span data-bind="text:price"></span>
+    </p>
     <p data-bind="ifnot:amount">not</p>
+
+    <div data-bind="with:info">
+            country:<span data-bind="text:country"></span><br/>
+            howFar:<span data-bind="text:howFar"></span><br/>
+            parent.name:<span data-bind="text:$parent.lastName"></span>
+    </div>
+
+    <div data-bind="foreach:phones">
+        <span data-bind="text:$index"></span>:
+        <span data-bind="text:$data"></span>
+    </div>
+    <div data-bind="foreach:phones">
+        <span data-bind="text:$index"></span>:
+        <span data-bind="text:$data"></span>
+    </div>
   <!--   <p>attr: <span data-bind="attr:{name:'hello'}">属性</span></p>
     <p>attr: <a data-bind="attr:{href:url,name:firstName},text:url">属性</a></p> -->
     <p><input type="button" value="changeTo123" id="myBtn"/></p>

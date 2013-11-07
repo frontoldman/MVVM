@@ -65,7 +65,7 @@
 
 		var dataCache = {};
 
-		'css visible attr text html style ifAndIfnot'.split(' ').forEach(function(val,key){
+		'css visible attr text html style ifAndIfnot foreach'.split(' ').forEach(function(val,key){
 			dataCache[val] = 'mvvm-' + val;
 		})
 
@@ -144,7 +144,6 @@
 		}
 
 		//通过闭包保存dom和事件trigger,实现绑定
-		
 		mvvm.observable = function(val){
 			var _currentDom = [],
 				_random = [],
@@ -181,6 +180,44 @@
 			return mvvmQQ529130510
 		}   
 		
+		//数组监控
+		mvvm.observableArray = function(initArray){
+			var changedArray = initArray  ?  initArray : [],
+				_random = [],
+				_currentDom = [],
+				i,
+				publish = function(callback){
+					for( i = 0;i<_currentDom.length;i++){
+						callback(_currentDom[i]);
+					}
+				};
+
+			return  {
+				/**
+				 * [initVal 初始化数组，初始化观察者]
+				 * @param  {object} domObj 有两个属性 wapper:foreach元素,inner:foreach内部元素
+				 * @param  {string} random 随机数，观察者的trigger
+				 * @return {[type]}        [description]
+				 */
+				initVal:function(domObj){
+					var random = getRandom(),
+						self = this;
+					_currentDom.push(domObj);
+					_random.push(random);
+					return changedArray;
+				},
+				push:function(val){
+					publish(function(currentDom){
+						var fragment = fillContext(currentDom.inner,val,changedArray.length,currentDom.context,null,currentDom.wapper);
+						currentDom.wapper.appendChild(fragment);
+					})
+					changedArray.push(val)
+				},
+				pop:function(){
+					
+				}
+			}
+		}
 
 		//添加进观察者的入口
 		//dom:操作的元素
@@ -224,8 +261,8 @@
 		        if(attrVal){
 		            attrVal = utils.trim(attrVal);
 		            dataBindElements.push({
-		                dom:currentDom,
-						attr:attrVal
+				dom:currentDom,
+				attr:attrVal
 		            });
 		        }
 		        if(!controlFlowElementsPattern.test(attrVal)){
@@ -238,15 +275,16 @@
 		
 		
 		var bindRoute = {
-			text:routeTextFn,
-			css:routeCssFn,
-			html:routeHtmlFn,
-			visible:routeVisibleFn,
-			style:routeStyleFn,
-			attr:routeAttrFn,
-			foreach:routeForeachFn,
+			'text':routeTextFn,
+			'css':routeCssFn,
+			'html':routeHtmlFn,
+			'visible':routeVisibleFn,
+			'style':routeStyleFn,
+			'attr':routeAttrFn,
+			'foreach':routeForeachFn,
 			'if':routeIfFn,
-			'ifnot':routeIfnotFn
+			'ifnot':routeIfnotFn,
+			'with':routeWithFn
 		}
 		
 		
@@ -283,9 +321,9 @@
 					type = utils.getType(vmValue);
 					currentFn = bindRoute[bindKey] ? bindRoute[bindKey]
 									: function(){};
-					//console.log(type)
-                    //console.log(currentFn)
-                    //console.log(currentDom)
+				//console.log(type)
+				//console.log(currentFn)
+				//console.log(currentDom)
 					switch(type){
 						case 'Function':
 
@@ -392,65 +430,40 @@
 		function routeForeachFn(ary){
 			var dom = ary[1],
 				foreachObj = ary[0],
+				type = utils.getType(foreachObj),
+				realForeachObj,
 				context = ary[2],
 				listDomTemplete ,
 				innerHtml = dom.innerHTML;
 
-	
-
+			
 			var childNodes = getChildNodes(dom),
-			fragment = document.createDocumentFragment();
+				fragment = document.createDocumentFragment();
+
+			//data(dom,dataCache[val],childNodes);
+			switch(type){
+				case 'Object':
+					realForeachObj = foreachObj.initVal({
+						wapper:dom,
+						inner:childNodes,
+						context:context
+					});
+					break;
+				default:
+					realForeachObj = foreachObj;
+					break;
+			}
 
 			//dom.innerHTML = '';
-			foreachObj.forEach(function(objVal,objKey){
-				fillContext(childNodes,objVal,objKey);
+			realForeachObj.forEach(function(objVal,objKey){
+				fillContext(childNodes,objVal,objKey,context,fragment);
 			})
 			dom.innerHTML = '';
 			dom.appendChild(fragment);
-			//区分child nodeType的路由
-			function fillContext(childNodes,objVal,objKey){
-				var childNodeAttr,
-					childAttrObj,
-					objValType = utils.getType(objVal),
-					newObjVal,
-					newElementsList ;
-
-				newObjVal = {
-					$data:objVal,
-					$index:objKey,
-					$parent:context
-				}
-				
-				utils.extend(newObjVal,objVal);
-
-				childNodes.forEach(function(childNode,childKey){
-					var newChildNode = childNode.cloneNode(true);
-					var newDomAry;
-					switch(childNode.nodeType){
-						//元素节点
-						case 1:
-							childNodeAttrs = getAttribute(newChildNode);
-							newElementsList =  getTriggerDoms(newChildNode);
-							if(childNodeAttrs || newElementsList.length){
-								if(childNodeAttrs){
-									newElementsList.push({
-										dom:newChildNode,
-										attr:childNodeAttrs
-									})	
-								}
-								analysisBindRulers(newObjVal,newElementsList)
-							}
-							break;
-						default:
-							break;
-					}
-					fragment.appendChild(newChildNode);
-				})
-				
-			}
-
+			
 		}
-
+		
+		//todo:if内部的元素可能会被监控，通过html操作这些元素会丢失dom的引用
 		//if路由
 		function routeIfFn(ary){
 			var dom = ary[1],
@@ -482,6 +495,30 @@
 				dom.innerHTML = cache ? cache : '';
 			}
 		}
+
+		//with
+		function routeWithFn(ary){
+			var dom = ary[1],
+				withObj = ary[0],
+				$parent = ary[2],
+				childNodeAttrs,
+				newElementsList;
+
+			withObj.$parent = $parent;
+
+			childNodeAttrs = getAttribute(dom);
+			newElementsList =  getTriggerDoms(dom);
+			if(childNodeAttrs || newElementsList.length){
+				if(childNodeAttrs){
+					newElementsList.push({
+						dom:dom,
+						attr:childNodeAttrs
+					})	
+				}
+				analysisBindRulers(withObj,newElementsList)
+			}
+		}
+
 		//################################
 		//常用方法
 		function getRandom(){
@@ -508,6 +545,52 @@
 				attrValueObject = {};
 			}
 			return attrValueObject;
+		}
+
+		//区分child nodeType的路由
+		function fillContext(childNodes,objVal,objKey,context,fragment,parentNode){
+			var childNodeAttr,
+				childAttrObj,
+				objValType = utils.getType(objVal),
+				newObjVal,
+				newElementsList;
+
+			newObjVal = {
+				$data:objVal,
+				$index:objKey,
+				$parent:context
+			}
+			
+			utils.extend(newObjVal,objVal);
+			fragment = fragment ? fragment : document.createDocumentFragment();
+
+			childNodes.forEach(function(childNode,childKey){
+				var newChildNode;
+				newChildNode = childNode.cloneNode(true);
+				//更新原始节点，因为ie操作无法操作原始节点
+				childNodes[childKey] = newChildNode;
+				var newDomAry;
+				switch(childNode.nodeType){
+					//元素节点
+					case 1:
+						childNodeAttrs = getAttribute(newChildNode);
+						newElementsList =  getTriggerDoms(newChildNode);
+						if(childNodeAttrs || newElementsList.length){
+							if(childNodeAttrs){
+								newElementsList.push({
+									dom:newChildNode,
+									attr:childNodeAttrs
+								})	
+							}
+							analysisBindRulers(newObjVal,newElementsList)
+						}
+						break;
+					default:
+						break;
+				}
+				fragment.appendChild(newChildNode);
+			})
+			return fragment;
 		}
 
 		//############################################################
