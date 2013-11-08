@@ -52,12 +52,43 @@
 		    };
 		}
 
-        //from http://www.cnblogs.com/rubylouvre/archive/2011/05/30/1583523.html
-        if(!!window.find){
-            HTMLElement.prototype.contains = function(B){
-                return this.compareDocumentPosition(B) - 19 > 0
-            }
-        }
+		        //from http://www.cnblogs.com/rubylouvre/archive/2011/05/30/1583523.html
+		        if(!!window.find){
+		            HTMLElement.prototype.contains = function(B){
+		                return this.compareDocumentPosition(B) - 19 > 0
+		            }
+		        }
+
+		        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/indexOf
+		        if (!Array.prototype.indexOf) {
+			  Array.prototype.indexOf = function (searchElement , fromIndex) {
+			    var i,
+			        pivot = (fromIndex) ? fromIndex : 0,
+			        length;
+
+			    if (!this) {
+			      throw new TypeError();
+			    }
+
+			    length = this.length;
+
+			    if (length === 0 || pivot >= length) {
+			      return -1;
+			    }
+
+			    if (pivot < 0) {
+			      pivot = length - Math.abs(pivot);
+			    }
+
+			    for (i = pivot; i < length; i++) {
+			      if (this[i] === searchElement) {
+			        return i;
+			      }
+			    }
+			    return -1;
+			  };
+			}
+		        
 		//################################################
 		var mvvm = {}
 		//全局配置
@@ -263,12 +294,90 @@
 					var index = arguments[0]*1,
 						howmany = arguments[1]*1,
 						len = arguments.length,
-						i = 2;
+						i,
+						args = arguments ,
+						spliceResult ;
 
+					howmany = howmany<changedArray.length ?  howmany : changedArray.length;
 					index = index<0 ? changedArray.length - 1 - howmany : index ;
-					for(;i<len;i++){
-						
-					}
+
+					
+					publish(function(currentDom){
+						var childNodesCache = data(currentDom.wapper,dataCache['foreach']);
+						//console.log(childNodesCache[index][3]);
+						//console.log(index," ",howmany)
+						var spliceChildNodes = childNodesCache.splice(index,howmany);
+						//console.log(spliceChildNodes[0][3])
+						//console.log(childNodesCache);
+						//console.log(spliceResult)
+						if(utils.getType(spliceChildNodes) == 'Array'){
+							spliceChildNodes.forEach(function(foreachVal){
+								foreachVal.forEach(function(val){
+									currentDom.wapper.removeChild(val);
+								})
+							})
+						};
+
+						var flagNum = index;
+						var flag;
+						var fragment;
+						//console.log(flagNum)
+						for(var x = 2;x<args.length;x++){
+							//flag = childNodesCache[flagNum][childNodesCache[flagNum].length-1];
+							flag = childNodesCache[flagNum][0];
+							fragment = fillContext(currentDom.inner,args[x],flagNum,currentDom.context,null,currentDom.wapper,'splice');
+							//console.log(flag);
+							//console.log(childNodesCache[flagNum][0])
+							currentDom.wapper.insertBefore(fragment.fragment,flag);
+							childNodesCache.splice(flagNum,0,fragment.childNodes);
+							flagNum++;
+							//changedArray.splice(flagNum,0,args[x]);
+						};
+					})
+					spliceResult = Array.prototype.splice.apply(changedArray,args);
+					//spliceResult = changedArray.splice(index,howmany);
+					return spliceResult;
+				},
+				reverse:function(){
+					changedArray.reverse();
+					publish(function(currentDom){
+						data(currentDom.wapper,dataCache['foreach'],[]);
+
+						var fragment = document.createDocumentFragment();
+						changedArray.forEach(function(objVal,objKey){
+							fillContext(currentDom.inner,objVal,objKey,currentDom.context,fragment,currentDom.wapper);
+						})
+						currentDom.wapper.innerHTML = '';
+						currentDom.wapper.appendChild(fragment);
+						//var fragment = document.createDocumentFragment();
+
+
+					})
+					return changedArray;
+				},
+				//sort和reverse类似
+				sort:function(fn){
+					changedArray.sort(fn);
+					publish(function(currentDom){
+						data(currentDom.wapper,dataCache['foreach'],[]);
+
+						var fragment = document.createDocumentFragment();
+						changedArray.forEach(function(objVal,objKey){
+							fillContext(currentDom.inner,objVal,objKey,currentDom.context,fragment,currentDom.wapper);
+						})
+						currentDom.wapper.innerHTML = '';
+						currentDom.wapper.appendChild(fragment);
+						//var fragment = document.createDocumentFragment();
+
+
+					})
+					return changedArray;
+				},
+				indexOf:function(searchElement , fromIndex){
+					return changedArray.indexOf(searchElement,fromIndex);
+				},
+				slice:function(start,end){
+					return changedArray.indexOf(start,end);
 				}
 			}
 		}
@@ -608,7 +717,7 @@
 		}
 
 		//区分child nodeType的路由
-		function fillContext(childNodes,objVal,objKey,context,fragment,parentNode){
+		function fillContext(childNodes,objVal,objKey,context,fragment,parentNode,method){
 			var childNodeAttr,
 				childAttrObj,
 				objValType = utils.getType(objVal),
@@ -618,6 +727,8 @@
 				_currentChildNodes = [];
 
 			childNodesCache = childNodesCache ? childNodesCache : [] ;
+			//默认push也就是把元素默认插入到标签的最后
+			method = method ? method : 'push';
 
 			newObjVal = { 
 				$data:objVal,
@@ -656,7 +767,19 @@
 				_currentChildNodes.push(newChildNode);
 				fragment.appendChild(newChildNode);
 			})
-			childNodesCache.push(_currentChildNodes);
+			switch(method){
+				case 'push':
+					childNodesCache.push(_currentChildNodes);	
+					break;
+				case 'splice':
+					//splice需要返回已修改childNodes的数组集合
+					fragment = {
+						fragment : fragment,
+						childNodes : _currentChildNodes
+					}
+					break;
+			}
+			
 			return fragment;
 		}
 
