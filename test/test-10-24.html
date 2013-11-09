@@ -83,6 +83,16 @@
                       console.log(o.phones.indexOf('HTC'))
 
                     }
+                    document.getElementById('removeBtn').onclick = function(){
+                      console.log(o.phones.remove('HTC'))
+
+                    }
+
+                    document.getElementById('removeAllBtn').onclick = function(){
+                      console.log(o.phones.removeAll())
+
+                    }
+
 	       })
        
     </script>
@@ -141,6 +151,8 @@
     <p><input type="button" value="reverse" id="reverseBtn"/></p>
     <p><input type="button" value="sort" id="sortBtn"/></p>
     <p><input type="button" value="indexOf" id="indexOfBtn"/></p>
+    <p><input type="button" value="remove" id="removeBtn"/></p>
+    <p><input type="button" value="removeAll" id="removeAllBtn"/></p>
 </div>
 
 

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MVVM</title>
+    <meta charset="UTF-8">
+    <style type="text/css">
+    .red{
+        color:red;
+    }
+    .green{
+        color:green;
+    }
+    </style>
+    <script type="text/javascript" src="../lib/load.js"></script>
+    <script type="text/javascript">
+		
+		
+
+        require(['../src/mvvm','../lib/utils/utils'],function(mvvm,utils){
+
+            var phone = ['iPhone','HTC','XIAOMI']
+
+            window.o = {
+                        firstName:mvvm.observable('li'),
+                        lastName:mvvm.observable('Ly</span>'),
+                        age:mvvm.observable(1111),
+                        changeAge:function(){
+                            this.age(222);
+                        },
+                        css:mvvm.observable('red'),
+                        changeCss:function(){
+                            this.css('green')
+                        },
+                        price:'<span class="red">$1111</span>',
+                        married:mvvm.observable(true),
+                        changeColor:mvvm.observable('red'),
+                        url:mvvm.observable('http://www.baidu.com'),
+                        people:[
+                            {firstName:'lily',lastName:mvvm.observable('hahahahhehe')},
+                            {firstName:'苍',lastName:'井空'}
+                        ],
+                        amount:mvvm.observable('true'),
+                        info:{
+                            country:'china',
+                            howFar:mvvm.observable(1000)
+                        },
+                        phones:mvvm.observableArray(phone)
+                    }
+
+                mvvm.applyBindings(o,document.getElementById('content'))
+			 
+
+                    
+
+	       })
+       
+    </script>
+</head>
+<body>
+<p>First name: <strong data-bind="text:firstName ">todo</strong></p>
+<div id="content">
+    <p data-bind="text:age,css:css"></p>
+    <input type="button" data-bind="click:changeAge" value="改变age"/>
+    <input type="button" data-bind="event:{click:changeAge,mouseover:changeCss}" value="改变age"/>
+
+    <p data-bind="text:firstName"></p>
+    <input type="text" data-bind="value:firstName"/>
+   <!--  <botton data-bind="click:changeAge">监控age</button> -->
+</div>
+
+
+
+</body>
+</html>

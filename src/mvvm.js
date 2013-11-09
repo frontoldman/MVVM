@@ -179,7 +179,7 @@
 			var _currentDom = [],
 				_random = [],
 				_objectKey;
-			function mvvmQQ529130510(newVal,currentDom,random,bindLast){
+			function mvvmQQ529130510(newVal,currentDom,random,bindLast,vm,attrsValueObject){
 				if(currentDom){
 					_currentDom.push(currentDom)
 				}
@@ -202,7 +202,7 @@
 						observableVal = valSet;
 					}
 
-					pubsub.publish(_random[i],[observableVal,_currentDom[i]]);
+					pubsub.publish(_random[i],[observableVal,_currentDom[i],vm,attrsValueObject]);
 				}
 
 				return observableVal;
@@ -377,7 +377,17 @@
 					return changedArray.indexOf(searchElement,fromIndex);
 				},
 				slice:function(start,end){
-					return changedArray.indexOf(start,end);
+					return changedArray.slice(start,end);
+				},
+				remove:function(searchElement){
+					var index = changedArray.indexOf(searchElement);
+					if(index != -1){
+						return this.splice(index,1);
+					}
+					return null;
+				},
+				removeAll:function(){
+					return this.splice(0,changedArray.length)
 				}
 			}
 		}
@@ -388,7 +398,7 @@
 		//dataKey:操作dom的多个相同性质的属性时需区分的key值
 		//observableFunc:观察者的回调
 		//viewModelFunc:被观察对象属性的回调
-		function pushPubSub(dom,attr,observableFunc,viewModelFunc,dataKey){
+		function pushPubSub(dom,attr,observableFunc,viewModelFunc,dataKey,vm,attrsValueObject){
 			var random = getRandom();
 			pubsub.subscribe(random,observableFunc);
 			//var attrCache = data(dom,dataCache[attr]);
@@ -403,7 +413,7 @@
 				data(dom, random , attr);
 			}
 			
-			return viewModelFunc(undefined,dom,random,true);
+			return viewModelFunc(undefined,dom,random,true,vm,attrsValueObject);
 		}
 
 		/*
@@ -447,7 +457,11 @@
 			'foreach':routeForeachFn,
 			'if':routeIfFn,
 			'ifnot':routeIfnotFn,
-			'with':routeWithFn
+			'with':routeWithFn,
+			'click':routeClickFn,
+			'event':routeEventFn,
+			'value':routeValueFn,
+			'valueUpdate':valueUpdate
 		}
 		
 		
@@ -455,7 +469,6 @@
 		
 		//有史以来最伟大的正则表达式诞生了
 		var mainBindPatternStr = '\\s*(?:([^,?:]+)\\s*:\\s*){1}?([^,]*\\{(?:.+:.+,?)*\\}|\\[[^\\]]*\\]|[^,]*\\?[^:]*:[^,]*|[^\\{:\\}\\[\\],]*)';
-		var bindPattern;
 		
 		
 		function analysisBindRulers(vm,domsAndAttrs){
@@ -484,21 +497,14 @@
 					type = utils.getType(vmValue);
 					currentFn = bindRoute[bindKey] ? bindRoute[bindKey]
 									: function(){};
-				//console.log(type)
-				//console.log(currentFn)
-				//console.log(currentDom)
-					switch(type){
-						case 'Function':
-
-							if(vmValue.name === observableFunctionName){
-								pushPubSub(currentDom,bindKey,currentFn,vmValue)
-							}
-							break;
-						default:
-
-							currentFn([vmValue,currentDom,vm]);
-							break;
+	
+					if(type === 'Function' && vmValue.name === observableFunctionName){
+						pushPubSub(currentDom,bindKey,currentFn,vmValue,null,vm,attrsValueObject);
+					}else{
+			
+						currentFn([vmValue,currentDom,vm,attrsValueObject]);
 					}
+		
 				}	
 			}
 			return domsAndAttrs;
@@ -688,6 +694,67 @@
 			}
 		}
 
+		//click
+		function routeClickFn(ary){
+			var dom = ary[1],
+				handler = ary[0],
+				$parent = ary[2];
+				//console.log($parent);
+			
+			//直接写不知道为何this指向是错误的，指到一个包含handler本身的数组，不明白	
+			events.on(dom,'click',function(){
+				handler.bind($parent)();
+			});
+		}
+
+		//event
+		function routeEventFn(ary){
+			var dom = ary[1],
+				handlerObj = ary[0],
+				$parent = ary[2];
+				//console.log($parent);
+			if(utils.getType(handlerObj) != 'Object'){
+				return;
+			}
+			for(var handler in handlerObj){
+				(function(eventType){
+					events.on(dom,eventType,function(){
+						handlerObj[eventType].bind($parent)();
+					});
+				})(handler)
+			}
+		}
+
+		//value
+		function routeValueFn(ary){
+			var dom = ary[1],
+				value = ary[0],
+				$parent = ary[2],
+				attrsValueObject = ary[3];
+
+			dom.value = value;
+			
+			//给form元素绑定双向事件
+			var valueType = utils.getType(attrsValueObject.value),
+				valueUpdateMethod = attrsValueObject.valueUpdate;
+
+			if(valueType === 'Function' && attrsValueObject.value.name === observableFunctionName){
+
+				valueUpdateMethod = valueUpdateMethod ? valueUpdateMethod : 'keyup';
+				events.on(dom,valueUpdateMethod,function(){
+					//
+					$parent.firstName(dom.value);
+				})
+			}
+
+		}
+
+		function valueUpdate(){
+			var dom = ary[1],
+				eventType = ary[0];
+
+
+		}
 		//################################
 		//常用方法
 		function getRandom(){
@@ -705,7 +772,7 @@
 			try{
 				_fn = new Function('scope','var attrObj ;with( scope ){attrObj = {'+ currentAttr +'}};return attrObj;')
 			}catch(e){
-				throw 'Error expressions!';
+				throw 'Wrong expressions!';
 			}
 
 			try{
