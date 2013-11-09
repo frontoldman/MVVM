@@ -96,7 +96,7 @@
 
 		var dataCache = {};
 
-		'css visible attr text html style ifAndIfnot foreach'.split(' ').forEach(function(val,key){
+		'css visible attr text html style ifAndIfnot foreach value'.split(' ').forEach(function(val,key){
 			dataCache[val] = 'mvvm-' + val;
 		})
 
@@ -461,7 +461,10 @@
 			'click':routeClickFn,
 			'event':routeEventFn,
 			'value':routeValueFn,
-			'valueUpdate':valueUpdate
+			'valueUpdate':valueUpdate,
+			'enable':routeEnableFn,
+			'disbaled':routeDisableFn,
+			'checked':routeCheckedFn
 		}
 		
 		
@@ -506,6 +509,13 @@
 					}
 		
 				}	
+			}
+
+			vm.toJSON = function(){
+				var resultJSON = {};
+				for(var key in this){
+
+				}
 			}
 			return domsAndAttrs;
 		}
@@ -726,6 +736,7 @@
 		}
 
 		//value
+		var valueValPattern = /value\s*:\s*(.+),?/;
 		function routeValueFn(ary){
 			var dom = ary[1],
 				value = ary[0],
@@ -734,16 +745,22 @@
 
 			dom.value = value;
 			
+			if(data(dom,dataCache.value)){
+				return;
+			}
+
 			//给form元素绑定双向事件
 			var valueType = utils.getType(attrsValueObject.value),
-				valueUpdateMethod = attrsValueObject.valueUpdate;
+				valueUpdateMethod = attrsValueObject.valueUpdate,
+				attrValAry = valueValPattern.exec(dom.getAttribute(mvvm.trigger));
 
 			if(valueType === 'Function' && attrsValueObject.value.name === observableFunctionName){
-
+				data(dom,dataCache.value,true);
 				valueUpdateMethod = valueUpdateMethod ? valueUpdateMethod : 'keyup';
 				events.on(dom,valueUpdateMethod,function(){
-					//
-					$parent.firstName(dom.value);
+					if(attrValAry && attrValAry.length>=2){
+						$parent[utils.trim(attrValAry[1])](dom.value);
+					}
 				})
 			}
 
@@ -752,8 +769,38 @@
 		function valueUpdate(){
 			var dom = ary[1],
 				eventType = ary[0];
+		}
 
+		//enable
+		function routeEnableFn(ary){
+			var dom = ary[1],
+				isTrue = ary[0];
 
+			if(isTrue){
+				dom.removeAttribute('disabled');
+			}else{
+				dom.setAttribute('disabled','disabled');
+			}
+		}
+
+		//disable
+		function routeDisableFn(ary){
+			var dom = ary[1],
+				isTrue = ary[0];
+
+			if(isTrue){
+				dom.setAttribute('disabled','disabled');
+			}else{
+				dom.removeAttribute('disabled');
+			}
+		}
+
+		//checked
+		function routeCheckedFn(ary){
+			var dom = ary[1],
+				isChecked = ary[0];
+
+			dom.checked = isChecked ;
 		}
 		//################################
 		//常用方法

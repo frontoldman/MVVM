@@ -33,6 +33,9 @@
                         },
                         price:'<span class="red">$1111</span>',
                         married:mvvm.observable(true),
+                        changeMarrid:function(){
+                            this.married(false);
+                        },
                         changeColor:mvvm.observable('red'),
                         url:mvvm.observable('http://www.baidu.com'),
                         people:[
@@ -62,8 +65,10 @@
     <p data-bind="text:age,css:css"></p>
     <input type="button" data-bind="click:changeAge" value="改变age"/>
     <input type="button" data-bind="event:{click:changeAge,mouseover:changeCss}" value="改变age"/>
-
+    <input data-bind="enable:married,value:url"/><br/>
+    <button data-bind="click:changeMarrid">changeMarrid</button>
     <p data-bind="text:firstName"></p>
+    <input type="text" data-bind="value:firstName"/><br/>
     <input type="text" data-bind="value:firstName"/>
    <!--  <botton data-bind="click:changeAge">监控age</button> -->
 </div>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MVVM</title>
+    <meta charset="UTF-8">
+    <style type="text/css">
+    .red{
+        color:red;
+    }
+    .green{
+        color:green;
+    }
+    </style>
+    <script type="text/javascript" src="../lib/load.js"></script>
+    <script type="text/javascript">
+		
+		
+
+        require(['../src/mvvm','../lib/utils/utils'],function(mvvm,utils){
+
+            var phone = ['iPhone','HTC','XIAOMI']
+
+            var o = {
+                       clothes:mvvm.observableArray([
+                            {year:1988,name:'睡衣'},
+                            {year:1989,name:'裤子'}
+                        ]),
+                       add:function(){
+                        console.log(this._year())
+                        this.clothes.push({
+                            year:this._year(),
+                            name:this._name()
+                        })
+                       },
+                       _year:mvvm.observable(''),
+                       _name:mvvm.observable('')
+                    }
+
+                mvvm.applyBindings(o,document.getElementById('content'))
+			 
+
+                    
+
+	       })
+       
+    </script>
+</head>
+<body>
+<p>First name: <strong data-bind="text:firstName ">todo</strong></p>
+<div id="content">
+    <div data-bind="foreach:clothes">
+        <p>
+            <span data-bind="text:$data.year"></span>:
+            <strong data-bind="text:$data.name"></strong>
+        </p>
+    </div>
+    <div>
+        <p data-bind="text:_year"></p>
+        <p>Year : <input type="text" data-bind="value:_year"/></p>
+        <p>name : <input type="text" data-bind="value:_name"/></p>
+        <input type="button" value="Add" data-bind="click:add"/>
+    </div>
+</div>
+
+
+
+</body>
+</html>
