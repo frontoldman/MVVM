@@ -192,6 +192,8 @@
 					observableVal ,
 					valSet = newVal === undefined ? val : newVal;
 
+				val = valSet;
+				//console.log(newVal)
 				
 				for(;i<_random.length;i++){
 					usedObj = data(_currentDom[i],_random[i]);
@@ -711,8 +713,16 @@
 				$parent = ary[2];
 				//console.log($parent);
 			
+			//冒泡到顶级作用域
+			// while($parent.$parent){
+			// 	$parent = $parent.$parent;
+			// }
+
+			//是forEach里面的事件this指向当前索引对象，其他指向viewMoadel
+			$parent = ary[2]._origin ? ary[2]._origin : $parent;
 			//直接写不知道为何this指向是错误的，指到一个包含handler本身的数组，不明白	
 			events.on(dom,'click',function(){
+				//console.log($parent)
 				handler.bind($parent)();
 			});
 		}
@@ -723,6 +733,12 @@
 				handlerObj = ary[0],
 				$parent = ary[2];
 				//console.log($parent);
+
+			//冒泡到顶级作用域
+			// while($parent.$parent){
+			// 	$parent = $parent.$parent;
+			// }
+			$parent = ary[2]._origin ? ary[2]._origin : $parent;
 			if(utils.getType(handlerObj) != 'Object'){
 				return;
 			}
@@ -744,6 +760,7 @@
 				attrsValueObject = ary[3];
 
 			dom.value = value;
+			
 			
 			if(data(dom,dataCache.value)){
 				return;
@@ -847,7 +864,8 @@
 			newObjVal = { 
 				$data:objVal,
 				$index:objKey,
-				$parent:context
+				$parent:context,
+				_origin:objVal
 			}
 			
 			utils.extend(newObjVal,objVal);

@@ -26,11 +26,15 @@
                             {year:1989,name:'裤子'}
                         ]),
                        add:function(){
-                        console.log(this._year())
+                       // console.log(this._year())
                         this.clothes.push({
                             year:this._year(),
                             name:this._name()
                         })
+                       },
+                       del:function(){
+                        console.log(this);
+                        o.clothes.remove(this);
                        },
                        _year:mvvm.observable(''),
                        _name:mvvm.observable('')
@@ -52,6 +56,7 @@
         <p>
             <span data-bind="text:$data.year"></span>:
             <strong data-bind="text:$data.name"></strong>
+            <button data-bind="click:$parent.del">del</button>
         </p>
     </div>
     <div>
