@@ -101,6 +101,7 @@
 		})
 
 		var observableFunctionName = 'mvvmQQ529130510';
+		var computedFunctionName = 'mvvmQQ529130510Computed';
 
 
 		//一个简单的观察者
@@ -394,12 +395,40 @@
 			}
 		}
 
+		//依赖跟踪
+		//knockout引入第二个参数的原因是this实在是没有办法指向vm
+		mvvm.computed = function(){
+			var FnOrObj = arguments[0],
+				owner = arguments[1],
+				type = utils.getType(FnOrObj);
+
+			var returnedVal;
+			//console.log(owner)
+			if(type === 'Function'){
+				//console.log(owner)
+				returnedVal = FnOrObj.bind(owner);
+			}
+
+			function mvvmQQ529130510Computed(newVal,dom,random,bindLast,vm,attrsValueObject){
+				pubsub.publish(random,[returnedVal(),dom,vm,attrsValueObject]);
+			}
+
+			//mvvmQQ529130510Computed.bind(owner);
+
+			mvvmQQ529130510Computed.name = computedFunctionName;
+
+			return mvvmQQ529130510Computed;
+		}
+
+
 		//添加进观察者的入口
 		//dom:操作的元素
 		//attr:操作dom的某种属性
 		//dataKey:操作dom的多个相同性质的属性时需区分的key值
 		//observableFunc:观察者的回调
 		//viewModelFunc:被观察对象属性的回调
+		//vm:绑定的viewModel
+		//attrsValueObject:当前dom的绑定attr字符串属性
 		function pushPubSub(dom,attr,observableFunc,viewModelFunc,dataKey,vm,attrsValueObject){
 			var random = getRandom();
 			pubsub.subscribe(random,observableFunc);
@@ -505,8 +534,9 @@
 	
 					if(type === 'Function' && vmValue.name === observableFunctionName){
 						pushPubSub(currentDom,bindKey,currentFn,vmValue,null,vm,attrsValueObject);
-					}else{
-			
+					}else if(type === 'Function' && vmValue.name === computedFunctionName){
+						pushPubSub(currentDom,bindKey,currentFn,vmValue,null,vm,attrsValueObject);
+					}else {
 						currentFn([vmValue,currentDom,vm,attrsValueObject]);
 					}
 		
