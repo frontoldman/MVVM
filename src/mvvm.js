@@ -410,6 +410,7 @@
 			}
 
 			function mvvmQQ529130510Computed(newVal,dom,random,bindLast,vm,attrsValueObject){
+				//console.log(returnedVal())
 				pubsub.publish(random,[returnedVal(),dom,vm,attrsValueObject]);
 			}
 
@@ -443,7 +444,7 @@
 			}else{
 				data(dom, random , attr);
 			}
-			
+			//console.log(observableFunc)
 			return viewModelFunc(undefined,dom,random,true,vm,attrsValueObject);
 		}
 
