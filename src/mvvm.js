@@ -442,6 +442,7 @@
 			}
 
 			function mvvmQQ529130510Computed(newVal,dom,random,bindLast,vm,attrsValueObject){
+<<<<<<< HEAD
 				
 				console.log('computed--before')
 				//需要一个异步去取得依赖列表
@@ -456,6 +457,10 @@
 					tempId = null;
 				})
 				
+=======
+				//console.log(returnedVal())
+				pubsub.publish(random,[returnedVal(),dom,vm,attrsValueObject]);
+>>>>>>> 9849d97d44ed05e8a11ade0d4f847c3fd8710adf
 			}
 
 			mvvmQQ529130510Computed.name = computedFunctionName;
@@ -485,7 +490,7 @@
 			}else{
 				data(dom, random , attr);
 			}
-			
+			//console.log(observableFunc)
 			return viewModelFunc(undefined,dom,random,true,vm,attrsValueObject);
 		}
 
