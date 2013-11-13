@@ -103,7 +103,9 @@
 		var observableFunctionName = 'mvvmQQ529130510';
 		var computedFunctionName = 'mvvmQQ529130510Computed';
 
-
+		var computed_relay = {};
+		var startComputed = false;
+		var tempId;
 		//一个简单的观察者
 		//For details, see http://www.cnblogs.com/tomxu/archive/2012/03/02/2355128.html
 		var pubsub = {};
@@ -179,37 +181,67 @@
 		mvvm.observable = function(val){
 			var _currentDom = [],
 				_random = [],
-				_objectKey;
+				_objectKey,
+				initFlag = false,
+				timeOut = 'hasStart';	//绑定数据可以延迟执行
 			function mvvmQQ529130510(newVal,currentDom,random,bindLast,vm,attrsValueObject){
-				if(currentDom){
-					_currentDom.push(currentDom)
-				}
-				if(random){
-					_random.push(random);
-				}
-				
-				var i = bindLast ?  _random.length-1 : 0,//初始化绑定只绑定最后一个
-					usedObj,
-					observableVal ,
-					valSet = newVal === undefined ? val : newVal;
-
-				val = valSet;
-				//console.log(newVal)
-				
-				for(;i<_random.length;i++){
-					usedObj = data(_currentDom[i],_random[i]);
-					if(utils.getType(usedObj) === 'Object'){
-						observableVal  = {};
-						observableVal[usedObj['attr']] = valSet;
-					}else{
-						observableVal = valSet;
+				// if(timeOut != 'hasStart'){
+				// 	clearTimeout(timeOut);
+				// }
+				// timeOut = setTimeout(function(){
+					
+					//arguments.callee
+					timeOut = 'hasStart';
+					if(currentDom){
+						_currentDom.push(currentDom)
 					}
+					if(random){
+						_random.push(random);
+					}
+					
+					var i = bindLast ?  _random.length-1 : 0,//初始化绑定只绑定最后一个
+						usedObj,
+						observableVal ,
+						valSet = newVal === undefined ? val : newVal;
 
-					pubsub.publish(_random[i],[observableVal,_currentDom[i],vm,attrsValueObject]);
-				}
+					val = valSet;
+					//console.log(newVal)
+					
+					// if(newVal === undefined && initFlag){
+					// 	//return val;
+					// }
+					console.log('computed--in')
+					if(startComputed){
+						var relayBy = computed_relay[_random[i]];
+						if(relayBy){
+							
+						} else{
+							computed_relay[_random[i]] = {}
+						}
+						tempId = _random[i];
+						computed_relay[_random[i]] = valSet;
+					}
+					for(;i<_random.length;i++){
+						usedObj = data(_currentDom[i],_random[i]);
+						if(utils.getType(usedObj) === 'Object'){
+							observableVal  = {};
+							observableVal[usedObj['attr']] = valSet;
+						}else{
+							observableVal = valSet;
+						}
+						
+						pubsub.publish(_random[i],[observableVal,_currentDom[i],vm,attrsValueObject]);
+					}
+				//})
+				
 
-				return observableVal;
+				// if(newVal === undefined){
+				// 	initFlag = true;
+				// }
+
+				return val;
 			}
+
 			mvvmQQ529130510.name = observableFunctionName;
 			return mvvmQQ529130510
 		}   
@@ -410,13 +442,23 @@
 			}
 
 			function mvvmQQ529130510Computed(newVal,dom,random,bindLast,vm,attrsValueObject){
-				pubsub.publish(random,[returnedVal(),dom,vm,attrsValueObject]);
+				
+				console.log('computed--before')
+				//需要一个异步去取得依赖列表
+				setTimeout(function(){
+					console.log('computed--start')
+					startComputed = true;
+					pubsub.publish(random,[returnedVal(),dom,vm,attrsValueObject]);
+					console.log('computed--end')
+					startComputed = false;
+					console.log(computed_relay)
+					console.log(tempId)
+					tempId = null;
+				})
+				
 			}
 
-			//mvvmQQ529130510Computed.bind(owner);
-
 			mvvmQQ529130510Computed.name = computedFunctionName;
-
 			return mvvmQQ529130510Computed;
 		}
 
@@ -549,6 +591,7 @@
 
 				}
 			}
+			
 			return domsAndAttrs;
 		}
 		
