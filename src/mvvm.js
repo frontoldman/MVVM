@@ -103,9 +103,9 @@
 		var observableFunctionName = 'mvvmQQ529130510';
 		var computedFunctionName = 'mvvmQQ529130510Computed';
 
-		var computed_relay = {};
+		var computed_relay = {};	//computed依赖列表
 		var startComputed = false;
-		var tempId;
+		var tempIds = {};	//临时computed列表，每次清空
 		//一个简单的观察者
 		//For details, see http://www.cnblogs.com/tomxu/archive/2012/03/02/2355128.html
 		var pubsub = {};
@@ -185,13 +185,12 @@
 				initFlag = false,
 				timeOut = 'hasStart';	//绑定数据可以延迟执行
 			function mvvmQQ529130510(newVal,currentDom,random,bindLast,vm,attrsValueObject){
-				// if(timeOut != 'hasStart'){
-				// 	clearTimeout(timeOut);
-				// }
-				// timeOut = setTimeout(function(){
-					
-					//arguments.callee
-					timeOut = 'hasStart';
+				
+					if(!arguments.length && !startComputed){
+						//onsole.log("没有参数：" + val)
+						return val;
+					}
+
 					if(currentDom){
 						_currentDom.push(currentDom)
 					}
@@ -210,16 +209,12 @@
 					// if(newVal === undefined && initFlag){
 					// 	//return val;
 					// }
-					console.log('computed--in')
+					//console.log('computed--in')
 					if(startComputed){
-						var relayBy = computed_relay[_random[i]];
-						if(relayBy){
-							
-						} else{
-							computed_relay[_random[i]] = {}
-						}
-						tempId = _random[i];
-						computed_relay[_random[i]] = valSet;
+						//computed_relay[_random[i]] = true;
+						tempIds[_random[i]] = true;
+						//console.log('loop')
+						return val;
 					}
 					for(;i<_random.length;i++){
 						usedObj = data(_currentDom[i],_random[i]);
@@ -231,13 +226,24 @@
 						}
 						
 						pubsub.publish(_random[i],[observableVal,_currentDom[i],vm,attrsValueObject]);
+
+
 					}
 				//})
 				
 
-				// if(newVal === undefined){
-				// 	initFlag = true;
-				// }
+				var theObjRelayOn = computed_relay[_random[0]];
+				if(theObjRelayOn){
+					//console.log(theObjRelayOn.vm)
+					theObjRelayOn.forEach(function(theObjRelayOnObj){
+						pubsub.publish(theObjRelayOnObj.random,
+							[theObjRelayOnObj.val(),
+							theObjRelayOnObj.dom,
+							theObjRelayOnObj.vm,
+							theObjRelayOnObj.attrsValueObject]);
+					})
+					
+				}		
 
 				return val;
 			}
@@ -434,29 +440,47 @@
 				owner = arguments[1],
 				type = utils.getType(FnOrObj);
 
-			var returnedVal;
+			var returnedVal,result;
 			//console.log(owner)
 			if(type === 'Function'){
-				//console.log(owner)
 				returnedVal = FnOrObj.bind(owner);
 			}
 
 			function mvvmQQ529130510Computed(newVal,dom,random,bindLast,vm,attrsValueObject){
 
 				
-				console.log('computed--before')
+				//console.log('computed--before')
 				//需要一个异步去取得依赖列表
 				setTimeout(function(){
-					console.log('computed--start')
+					//console.log('computed--start')
+
 					startComputed = true;
-					pubsub.publish(random,[returnedVal(),dom,vm,attrsValueObject]);
-					console.log('computed--end')
+					result = returnedVal();
+					pubsub.publish(random,[result,dom,vm,attrsValueObject]);
+					//console.log('computed--end')
 					startComputed = false;
-					console.log(computed_relay)
-					console.log(tempId)
-					tempId = null;
+
+					for(var id in tempIds){
+						var relayOns = computed_relay[id];
+						
+						relayOns = relayOns ? relayOns : [];
+						computed_relay[id] = relayOns;
+						//console.log(relayOns)
+						relayOns.push({
+							random:random,
+							val:returnedVal,
+							dom:dom,
+							vm:vm,
+							attrsValueObject:attrsValueObject
+						})
+						
+					}
+					//console.log(computed_relay)
+					//console.log(tempIds)
+					tempIds = {};
 				})
 				
+				return result;
 
 			}
 
