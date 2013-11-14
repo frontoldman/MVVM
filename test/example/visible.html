@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MVVM-visible</title>
+    <meta charset="UTF-8">
+    <style type="text/css">
+    .red{
+        color:red;
+    }
+    .green{
+        color:green;
+    }
+    </style>
+    <script type="text/javascript" src="../../lib/load.js"></script>
+    <script type="text/javascript">
+		
+		
+
+                require(['.../src/mvvm'],function(mvvm){
+                    var AppModel = function(){
+                        var isShow = true;
+                        this.firstName = '<i>lily</i>';
+                        this.showName = mvvm.observable(true);
+                        this.toggle = function(){
+                            isShow = !isShow;
+                            this.showName(isShow)
+                        }
+                    }
+                    mvvm.applyBindings(new AppModel())
+                })
+       
+    </script>
+</head>
+<body>
+
+<p>First name: <strong data-bind="html:firstName,visible:showName">todo</strong></p>
+<input type="button" data-bind="click:toggle" value="隐藏/显示"/>
+
+
+
+</body>
+</html>

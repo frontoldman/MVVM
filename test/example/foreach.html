@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MVVM-foreach</title>
+    <meta charset="UTF-8">
+    <style type="text/css">
+    .red{
+        color:red;
+    }
+    .green{
+        color:green;
+    }
+    </style>
+    <script type="text/javascript" src="../../lib/load.js"></script>
+    <script type="text/javascript">
+		
+		
+
+                require(['.../src/mvvm'],function(mvvm){
+
+                    var phones = ['iPhone','HTC']
+
+                    var AppModel = function(){
+
+                        var self = this;
+                        this.phones = mvvm.observableArray(phones);;
+                        this._newPhoneByPush = mvvm.observable('');
+                        this._newPhoneByUnshift = mvvm.observable('');
+                        this.addPhoneByPush = function(){
+                            this.phones.push(this._newPhoneByPush());
+                        };
+                        this.addPhoneByUnshift = function(){
+                            this.phones.unshift(this._newPhoneByUnshift());
+                        };
+                        this.pop = function(){
+                            this.phones.pop();
+                        };
+                        this.shift = function(){
+                            this.phones.shift();
+                        }
+
+                        this._from = mvvm.observable(0);
+                        this._length = mvvm.observable(0);
+                        this.splice = function(){
+                            this.phones.splice(this._from(),this._length())
+                        }
+
+                        this.reverse = function(){
+                            this.phones.reverse();
+                        }
+
+                        this.sort = function(){
+                            this.phones.sort();
+                        }
+
+                        this.remove = function(){
+                            //console.log(this)
+                            self.phones.remove(this.toString());
+                        }
+                        this.removeAll = function(){
+                            //console.log(this)
+                            this.phones.removeAll();
+                        }
+                    }
+                    mvvm.applyBindings(new AppModel())
+                })
+       
+    </script>
+</head>
+<body>
+<ul data-bind="foreach:phones">
+    <li>
+        <i data-bind="text:$index"></i> ：<strong data-bind="text:$data"></strong> 
+        <button data-bind="click:$parent.remove">移除</button> 
+    </li>
+</ul>
+
+<p>
+    <input type="text" data-bind="value:_newPhoneByPush"/>
+    <input type="button" value="addPhone：push" data-bind="click:addPhoneByPush"/>
+    
+</p>
+<p>
+    <input type="text" data-bind="value:_newPhoneByUnshift"/>
+    <input type="button" value="addPhone：unshift" data-bind="click:addPhoneByUnshift"/>
+</p>
+<p>
+    <input type="button" value="removePhone：pop" data-bind="click:pop"/>
+</p>
+<p>
+    <input type="button" value="removePhone：shift" data-bind="click:shift"/>
+</p>
+<p>
+    From : <input type="text" data-bind="value:_from"/>　length : <input type="text" data-bind="value:_length"/>
+    <input type="button" value="removePhone：splice" data-bind="click:splice"/>
+</p>
+<p>
+    <input type="button" value="reverse" data-bind="click:reverse"/>
+</p>
+<p>
+    <input type="button" value="sort" data-bind="click:sort"/>
+</p>
+<p>
+    <input type="button" value="removeAll" data-bind="click:removeAll"/>
+</p>
+<p>
+    foreach 有数组全部的方法
+    push<br/>
+    unshift<br/>
+    pop<br/>
+    shift<br/>
+    splice<br/>
+    reverse<br/>
+    sort<br/>
+</p>
+
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MVVM-ifnot</title>
+    <meta charset="UTF-8">
+    <style type="text/css">
+    .red{
+        color:red;
+    }
+    .green{
+        color:green;
+    }
+    </style>
+    <script type="text/javascript" src="../../lib/load.js"></script>
+    <script type="text/javascript">
+		
+		
+
+        require(['.../src/mvvm'],function(mvvm){
+            var isShow = true;
+            var AppModel = function(){
+                this.firstName = 'Li';
+                this.showName = mvvm.observable(isShow);
+                this.changeShowName = function(){
+                    isShow = !isShow;
+                    this.showName(isShow);
+                }
+            }
+            mvvm.applyBindings(new AppModel())
+        })
+       
+    </script>
+</head>
+<body>
+<p>First name: <strong data-bind="text:firstName,ifnot:showName">todo</strong></p>
+<p><button  data-bind="click:changeShowName">ifnot改变</button></p>
+
+
+
+
+</body>
+</html>

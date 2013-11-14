@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MVVM-style</title>
+    <meta charset="UTF-8">
+    <style type="text/css">
+    .red{
+        color:red;
+    }
+    .green{
+        color:green;
+    }
+    </style>
+    <script type="text/javascript" src="../../lib/load.js"></script>
+    <script type="text/javascript">
+		
+		
+
+                require(['.../src/mvvm'],function(mvvm){
+                    var AppModel = function(){
+                        this.firstName = '<i>lily</i>';
+                        this.nameStyle = mvvm.observable({
+                            color:'#f00'
+                        });
+
+                        this.nameColor = mvvm.observable('#0f0')
+                        this.toggle = function(){
+                            this.nameStyle({color:'#00f'});
+                            this.nameColor ('#f00')
+                        }
+                    }
+                    mvvm.applyBindings(new AppModel())
+                })
+       
+    </script>
+</head>
+<body>
+
+<p>First name: <strong data-bind="html:firstName,style:nameStyle">todo</strong></p>
+<p>First name: <strong data-bind="html:firstName,style:{color:nameColor}">todo</strong></p>
+<input type="button" data-bind="click:toggle" value="隐藏/显示"/>
+
+
+
+</body>
+</html>

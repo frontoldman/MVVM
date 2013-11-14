@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MVVM-with</title>
+    <meta charset="UTF-8">
+    <style type="text/css">
+    .red{
+        color:red;
+    }
+    .green{
+        color:green;
+    }
+    ul{
+        font-size: 18px;
+        line-height: 200%;
+    }
+    </style>
+    <script type="text/javascript" src="../../lib/load.js"></script>
+    <script type="text/javascript">
+		
+		
+
+        require(['.../src/mvvm'],function(mvvm){
+            var AppModel = function(){
+                this.bindings = [
+                    {
+                        url:'text.html',
+                        title:'text'
+                    },
+                    {
+                        url:'css.html',
+                        title:'css'
+                    },
+                    {
+                        url:'foreach.html',
+                        title:'foreach'
+                    },
+                    {
+                        url:'html.html',
+                        title:'html'
+                    },
+                    {
+                        url:'if.html',
+                        title:'if'
+                    },
+                    {
+                        url:'ifnot.html',
+                        title:'ifnot'
+                    },
+                    {
+                        url:'style.html',
+                        title:'style'
+                    },
+                    {
+                        url:'visible.html',
+                        title:'visible'
+                    },
+                    {
+                        url:'with.html',
+                        title:'with'
+                    },
+                    {
+                        url:'value.html',
+                        title:'value'
+                    },
+                    {
+                        url:'event.html',
+                        title:'event'
+                    },
+                    {
+                        url:'attr.html',
+                        title:'attr'
+                    }
+                ];
+
+                this.firstNum = mvvm.observable(1);
+
+                this.lastNum = mvvm.observable(5)
+
+                this.count = mvvm.computed(function(){
+                    return this.firstNum() * this.lastNum();
+                },this)
+            }
+            mvvm.applyBindings(new AppModel())
+        })
+       
+    </script>
+</head>
+<body>
+
+    <p>
+        <i data-bind="text:firstNum"></i>　*　<strong data-bind="text:lastNum"></strong>　＝　<span data-bind="text:count"></span>
+    </p>
+    
+    <p>
+        <input type="text" data-bind="value:firstNum"/>
+    </p>
+    <p>
+        <input type="text" data-bind="value:lastNum"/>
+    </p>
+
+<ul data-bind="foreach:bindings">
+    <li>
+            <a href="#" data-bind="text:$data.title,attr:{href:$data.url}"></a>
+    </li>
+</ul>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MVVM-event</title>
+    <meta charset="UTF-8">
+    <style type="text/css">
+    .red{
+        color:red;
+    }
+    .green{
+        color:green;
+    }
+    </style>
+    <script type="text/javascript" src="../../lib/load.js"></script>
+    <script type="text/javascript">
+		
+		
+
+        require(['.../src/mvvm'],function(mvvm){
+          
+            var AppModel = function(){
+                this.firstName = mvvm.observable('Li');
+                this.css = mvvm.observable('red');
+                this.changeFirstName = function(){
+                    this.firstName(new Date())
+                }
+                this.changeGreen = function(){
+                    this.css('green');
+                }
+
+                this.changeRed = function(){
+                    this.css('red');
+                }
+            }
+            mvvm.applyBindings(new AppModel())
+        })
+       
+    </script>
+</head>
+<body>
+<p>First name: <strong data-bind="text:firstName,css:css">todo</strong></p>
+<p><input type="button" data-bind="event:{click:changeFirstName,mouseover:changeGreen,mouseout:changeRed}" value="移上来并点击"/><p>
+
+
+
+
+</body>
+</html>

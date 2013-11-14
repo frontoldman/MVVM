@@ -822,6 +822,7 @@
 			//直接写不知道为何this指向是错误的，指到一个包含handler本身的数组，不明白	
 			events.on(dom,'click',function(){
 				//console.log($parent)
+				//bind会把字符串转换成对象，这是个bug
 				handler.bind($parent)();
 			});
 		}
@@ -967,7 +968,10 @@
 				_origin:objVal
 			}
 			
-			utils.extend(newObjVal,objVal);
+			if(utils.getType(objVal) === 'Object'){
+				utils.extend(newObjVal,objVal);
+			}
+			
 			fragment = fragment ? fragment : document.createDocumentFragment();
 
 			childNodes.forEach(function(childNode,childKey){

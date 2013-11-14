@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MVVM-css</title>
+    <meta charset="UTF-8">
+    <style type="text/css">
+    .red{
+        color:red;
+    }
+    .green{
+        color:green;
+    }
+    </style>
+    <script type="text/javascript" src="../../lib/load.js"></script>
+    <script type="text/javascript">
+		
+		
+
+        require(['.../src/mvvm'],function(mvvm){
+
+           
+
+            var AppModel = function(){
+                this.firstName = 'lily'
+                this.css = 'red';
+            }
+
+            
+
+            mvvm.applyBindings(new AppModel())
+			 
+
+                    
+
+	})
+       
+    </script>
+</head>
+<body>
+<p>First name: <strong data-bind="text:firstName,css:css ">todo</strong></p>
+
+
+
+
+</body>
+</html>
