@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MVVM-with</title>
+    <meta charset="UTF-8">
+    <style type="text/css">
+    .red{
+        color:red;
+    }
+    .green{
+        color:green;
+    }
+    </style>
+    <script type="text/javascript" src="../../lib/load.js"></script>
+    <script type="text/javascript">
+		
+		
+
+        require(['.../src/mvvm'],function(mvvm){
+            var person = {
+                name:'li',
+                age:18
+            }
+            var AppModel = function(){
+                this.name = 'I am app';
+                this.sex = mvvm.observable('male');
+                this.person = person;
+            }
+
+            mvvm.applyBindings(new AppModel())
+        })
+       
+    </script>
+</head>
+<body>
+
+<b data-bind="text:sex"></b> 
+
+<p>   
+    <input type="radio" data-bind="checked:sex" name="sex" value="male"/>男 　<input type="radio" data-bind="checked:sex" name="sex" value="female"/>女
+</p>
+
+
+
+
+
+</body>
+</html>

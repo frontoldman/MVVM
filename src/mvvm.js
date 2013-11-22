@@ -96,7 +96,7 @@
 
 		var dataCache = {};
 
-		'css visible attr text html style ifAndIfnot foreach value'.split(' ').forEach(function(val,key){
+		'css visible attr text html style ifAndIfnot foreach value checked'.split(' ').forEach(function(val,key){
 			dataCache[val] = 'mvvm-' + val;
 		})
 
@@ -392,7 +392,6 @@
 						currentDom.wapper.appendChild(fragment);
 						//var fragment = document.createDocumentFragment();
 
-
 					})
 					return changedArray;
 				},
@@ -420,7 +419,7 @@
 				slice:function(start,end){
 					return changedArray.slice(start,end);
 				},
-				remove:function(searchElement){
+				remove:function(searchElement){ 
 					var index = changedArray.indexOf(searchElement);
 					if(index != -1){
 						return this.splice(index,1);
@@ -824,6 +823,7 @@
 				//console.log($parent)
 				//bind会把字符串转换成对象，这是个bug
 				handler.bind($parent)();
+				//handler.call($parent);
 			});
 		}
 
@@ -913,11 +913,34 @@
 		}
 
 		//checked
+		var checkedValPattern = /checked\s*:\s*(.+),?/;
 		function routeCheckedFn(ary){
 			var dom = ary[1],
-				isChecked = ary[0];
+				isChecked = ary[0],
+				$parent = ary[2],
+				attrsValueObject = ary[3];
 
-			dom.checked = isChecked ;
+			dom.checked = isChecked === dom.value ;
+
+			if(data(dom,dataCache.checked)){
+				return;
+			}
+
+			//给form元素绑定双向事件
+			var valueType = utils.getType(attrsValueObject.checked),
+				valueUpdateMethod = attrsValueObject.valueUpdate,
+				attrValAry = checkedValPattern.exec(dom.getAttribute(mvvm.trigger));
+
+			if(valueType === 'Function' && attrsValueObject.checked.name === observableFunctionName){
+				data(dom,dataCache.checked,true);
+				valueUpdateMethod = valueUpdateMethod ? valueUpdateMethod : 'change';
+				events.on(dom,valueUpdateMethod,function(){
+					if(attrValAry && attrValAry.length>=2){
+						$parent[utils.trim(attrValAry[1])](dom.value);
+					}
+				})
+			}
+
 		}
 		//################################
 		//常用方法
