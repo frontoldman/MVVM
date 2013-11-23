@@ -101,6 +101,7 @@
 		})
 
 		var observableFunctionName = 'mvvmQQ529130510';
+		var observableArrayName = 'QQ529130510ObservableArray';
 		var computedFunctionName = 'mvvmQQ529130510Computed';
 
 		var computed_relay = {};	//computed依赖列表
@@ -204,16 +205,11 @@
 						valSet = newVal === undefined ? val : newVal;
 
 					val = valSet;
-					//console.log(newVal)
-					
-					// if(newVal === undefined && initFlag){
-					// 	//return val;
-					// }
-					//console.log('computed--in')
+		
 					if(startComputed){
-						//computed_relay[_random[i]] = true;
+
 						tempIds[_random[i]] = true;
-						//console.log('loop')
+
 						return val;
 					}
 					for(;i<_random.length;i++){
@@ -229,12 +225,12 @@
 
 
 					}
-				//})
+
 				
 
 				var theObjRelayOn = computed_relay[_random[0]];
 				if(theObjRelayOn){
-					//console.log(theObjRelayOn.vm)
+
 					theObjRelayOn.forEach(function(theObjRelayOnObj){
 						pubsub.publish(theObjRelayOnObj.random,
 							[theObjRelayOnObj.val(),
@@ -264,172 +260,179 @@
 					}
 				};
 
-			return  {
-				/**
-				 * [initVal 初始化数组，初始化观察者]
-				 * @param  {object} domObj 有两个属性 wapper:foreach元素,inner:foreach内部元素
-				 * @param  {string} random 随机数，观察者的trigger
-				 * @return {[type]}        [description]
-				 */
-				initVal:function(domObj){
-					var random = getRandom(),
+			function QQ529130510ObservableArray(domObj){
+				if(!domObj){
+					return changedArray;
+				}
+
+				var random = getRandom(),
 						self = this;
+
 					_currentDom.push(domObj);
 					_random.push(random);
 					return changedArray;
-				},
-				push:function(){
-					var i = 0,
-						len = arguments.length,
-						val;
-					for(;i<len;i++){
-						val = arguments[i];
-						publish(function(currentDom){
-							var fragment = fillContext(currentDom.inner,val,changedArray.length,currentDom.context,null,currentDom.wapper);
-							currentDom.wapper.appendChild(fragment);
-							//console.log(data(currentDom.wapper,dataCache['foreach']));
-						})
-						changedArray.push(val);
-					}
-					return changedArray.length;
-				},
-				unshift:function(){
-					var i = 0,
-						len = arguments.length,
-						val;
-					for(;i<len;i++){
-						val = arguments[i];
-						publish(function(currentDom){
-							var fragment = fillContext(currentDom.inner,val,len-i-1,currentDom.context,null,currentDom.wapper);
-							currentDom.wapper.insertBefore(fragment,currentDom.wapper.firstChild);
-						})
-						changedArray.push(val);
-					}
-					return changedArray.length;
-				},
-				pop:function(){
+			}
+
+			QQ529130510ObservableArray.push = function(){
+				var i = 0,
+					len = arguments.length,
+					val;
+				for(;i<len;i++){
+					val = arguments[i];
 					publish(function(currentDom){
-						var childNodesCache = data(currentDom.wapper,dataCache['foreach']);
-						var lastChildNodes = childNodesCache.pop();
-						if(utils.getType(lastChildNodes) == 'Array'){
-							lastChildNodes.forEach(function(val){
+						var fragment = fillContext(currentDom.inner,val,changedArray.length,currentDom.context,null,currentDom.wapper);
+						currentDom.wapper.appendChild(fragment);
+						//console.log(data(currentDom.wapper,dataCache['foreach']));
+					})
+					changedArray.push(val);
+				}
+				return changedArray.length;
+			}
+
+			QQ529130510ObservableArray.unshift = function(){
+				var i = 0,
+					len = arguments.length,
+					val;
+				for(;i<len;i++){
+					val = arguments[i];
+					publish(function(currentDom){
+						var fragment = fillContext(currentDom.inner,val,len-i-1,currentDom.context,null,currentDom.wapper);
+						currentDom.wapper.insertBefore(fragment,currentDom.wapper.firstChild);
+					})
+					changedArray.push(val);
+				}
+				return changedArray.length;
+			}
+
+			QQ529130510ObservableArray.pop = function(){
+				publish(function(currentDom){
+					var childNodesCache = data(currentDom.wapper,dataCache['foreach']);
+					var lastChildNodes = childNodesCache.pop();
+					if(utils.getType(lastChildNodes) == 'Array'){
+						lastChildNodes.forEach(function(val){
+							currentDom.wapper.removeChild(val);
+						})
+					}
+				})
+				return changedArray.pop()
+			}
+
+			QQ529130510ObservableArray.shift = function(){
+				publish(function(currentDom){
+					var childNodesCache = data(currentDom.wapper,dataCache['foreach']);
+					var lastChildNodes = childNodesCache.shift();
+					if(utils.getType(lastChildNodes) == 'Array'){
+						lastChildNodes.forEach(function(val){
+							currentDom.wapper.removeChild(val);
+						})
+					}
+				})
+				return changedArray.shift()
+			}
+
+			QQ529130510ObservableArray.splice = function(){
+				var index = arguments[0]*1,
+					howmany = arguments[1]*1,
+					len = arguments.length,
+					i,
+					args = arguments ,
+					spliceResult ;
+
+				howmany = howmany<changedArray.length ?  howmany : changedArray.length;
+				index = index<0 ? changedArray.length - 1 - howmany : index ;
+
+				
+				publish(function(currentDom){
+					var childNodesCache = data(currentDom.wapper,dataCache['foreach']);
+		
+					var spliceChildNodes = childNodesCache.splice(index,howmany);
+	
+					if(utils.getType(spliceChildNodes) == 'Array'){
+						spliceChildNodes.forEach(function(foreachVal){
+							foreachVal.forEach(function(val){
 								currentDom.wapper.removeChild(val);
 							})
-						}
-					})
-					return changedArray.pop()
-				},
-				shift:function(){
-					publish(function(currentDom){
-						var childNodesCache = data(currentDom.wapper,dataCache['foreach']);
-						var lastChildNodes = childNodesCache.shift();
-						if(utils.getType(lastChildNodes) == 'Array'){
-							lastChildNodes.forEach(function(val){
-								currentDom.wapper.removeChild(val);
-							})
-						}
-					})
-					return changedArray.shift()
-				},
-				splice:function(){
-					var index = arguments[0]*1,
-						howmany = arguments[1]*1,
-						len = arguments.length,
-						i,
-						args = arguments ,
-						spliceResult ;
-
-					howmany = howmany<changedArray.length ?  howmany : changedArray.length;
-					index = index<0 ? changedArray.length - 1 - howmany : index ;
-
-					
-					publish(function(currentDom){
-						var childNodesCache = data(currentDom.wapper,dataCache['foreach']);
-						//console.log(childNodesCache[index][3]);
-						//console.log(index," ",howmany)
-						var spliceChildNodes = childNodesCache.splice(index,howmany);
-						//console.log(spliceChildNodes[0][3])
-						//console.log(childNodesCache);
-						//console.log(spliceResult)
-						if(utils.getType(spliceChildNodes) == 'Array'){
-							spliceChildNodes.forEach(function(foreachVal){
-								foreachVal.forEach(function(val){
-									currentDom.wapper.removeChild(val);
-								})
-							})
-						};
-
-						var flagNum = index;
-						var flag;
-						var fragment;
-						//console.log(flagNum)
-						for(var x = 2;x<args.length;x++){
-							//flag = childNodesCache[flagNum][childNodesCache[flagNum].length-1];
-							flag = childNodesCache[flagNum][0];
-							fragment = fillContext(currentDom.inner,args[x],flagNum,currentDom.context,null,currentDom.wapper,'splice');
-							//console.log(flag);
-							//console.log(childNodesCache[flagNum][0])
-							currentDom.wapper.insertBefore(fragment.fragment,flag);
-							childNodesCache.splice(flagNum,0,fragment.childNodes);
-							flagNum++;
-							//changedArray.splice(flagNum,0,args[x]);
-						};
-					})
-					spliceResult = Array.prototype.splice.apply(changedArray,args);
-					//spliceResult = changedArray.splice(index,howmany);
-					return spliceResult;
-				},
-				reverse:function(){
-					changedArray.reverse();
-					publish(function(currentDom){
-						data(currentDom.wapper,dataCache['foreach'],[]);
-
-						var fragment = document.createDocumentFragment();
-						changedArray.forEach(function(objVal,objKey){
-							fillContext(currentDom.inner,objVal,objKey,currentDom.context,fragment,currentDom.wapper);
 						})
-						currentDom.wapper.innerHTML = '';
-						currentDom.wapper.appendChild(fragment);
-						//var fragment = document.createDocumentFragment();
+					};
 
+					var flagNum = index;
+					var flag;
+					var fragment;
+
+					for(var x = 2;x<args.length;x++){
+
+						flag = childNodesCache[flagNum][0];
+						fragment = fillContext(currentDom.inner,args[x],flagNum,currentDom.context,null,currentDom.wapper,'splice');
+			
+						currentDom.wapper.insertBefore(fragment.fragment,flag);
+						childNodesCache.splice(flagNum,0,fragment.childNodes);
+						flagNum++;
+
+					};
+				})
+				spliceResult = Array.prototype.splice.apply(changedArray,args);
+
+				return spliceResult;
+			}
+
+			QQ529130510ObservableArray.reverse = function(){
+				changedArray.reverse();
+				publish(function(currentDom){
+					data(currentDom.wapper,dataCache['foreach'],[]);
+
+					var fragment = document.createDocumentFragment();
+					changedArray.forEach(function(objVal,objKey){
+						fillContext(currentDom.inner,objVal,objKey,currentDom.context,fragment,currentDom.wapper);
 					})
-					return changedArray;
-				},
-				//sort和reverse类似
-				sort:function(fn){
-					changedArray.sort(fn);
-					publish(function(currentDom){
-						data(currentDom.wapper,dataCache['foreach'],[]);
+					currentDom.wapper.innerHTML = '';
+					currentDom.wapper.appendChild(fragment);
 
-						var fragment = document.createDocumentFragment();
-						changedArray.forEach(function(objVal,objKey){
-							fillContext(currentDom.inner,objVal,objKey,currentDom.context,fragment,currentDom.wapper);
-						})
-						currentDom.wapper.innerHTML = '';
-						currentDom.wapper.appendChild(fragment);
-						//var fragment = document.createDocumentFragment();
+				})
+				return changedArray;
+			}
 
+			QQ529130510ObservableArray.sort = function(fn){
+				changedArray.sort(fn);
+				publish(function(currentDom){
+					data(currentDom.wapper,dataCache['foreach'],[]);
 
+					var fragment = document.createDocumentFragment();
+					changedArray.forEach(function(objVal,objKey){
+						fillContext(currentDom.inner,objVal,objKey,currentDom.context,fragment,currentDom.wapper);
 					})
-					return changedArray;
-				},
-				indexOf:function(searchElement , fromIndex){
-					return changedArray.indexOf(searchElement,fromIndex);
-				},
-				slice:function(start,end){
-					return changedArray.slice(start,end);
-				},
-				remove:function(searchElement){ 
-					var index = changedArray.indexOf(searchElement);
+					currentDom.wapper.innerHTML = '';
+					currentDom.wapper.appendChild(fragment);
+					//var fragment = document.createDocumentFragment();
+
+
+				})
+				return changedArray;
+			}
+
+			QQ529130510ObservableArray.indexOf = function(searchElement , fromIndex){
+				return changedArray.indexOf(searchElement,fromIndex);
+			}
+
+			QQ529130510ObservableArray.slice = function(start,end){
+				return changedArray.slice(start,end);
+			}
+
+			QQ529130510ObservableArray.remove = function(searchElement){
+				var index = changedArray.indexOf(searchElement);
 					if(index != -1){
 						return this.splice(index,1);
 					}
 					return null;
-				},
-				removeAll:function(){
-					return this.splice(0,changedArray.length)
-				}
 			}
+
+			QQ529130510ObservableArray.removeAll = function(){
+				return this.splice(0,changedArray.length);
+			}
+
+			QQ529130510ObservableArray.name = observableArrayName;
+
+			return QQ529130510ObservableArray;
+
 		}
 
 		//依赖跟踪
@@ -727,8 +730,8 @@
 			//当前childNode存储到缓存里面去
 			data(dom,dataCache['foreach'],[]);
 			switch(type){
-				case 'Object':
-					realForeachObj = foreachObj.initVal({
+				case 'Function':
+					realForeachObj = foreachObj({
 						wapper:dom,
 						inner:childNodes,
 						context:context
@@ -918,9 +921,36 @@
 			var dom = ary[1],
 				isChecked = ary[0],
 				$parent = ary[2],
-				attrsValueObject = ary[3];
+				attrsValueObject = ary[3],
+				actureVal;
 
-			dom.checked = isChecked === dom.value ;
+			if(!/input/i.test(dom.tagName)){
+				return;
+			}
+
+			var type = dom.type;
+			type = type.toLowerCase();
+
+			switch(type){
+				case 'radio':
+					dom.checked = isChecked === dom.value ;
+					break;
+				case 'checkbox':
+					var checkType = utils.getType(isChecked);
+					//console.log(isChecked)
+					if(checkType === 'Boolean'){
+						dom.checked = isChecked;
+					}else if(checkType === 'Function'){
+						actureVal = isChecked();
+						dom.checked = actureVal.indexOf(dom.value)>-1 ? true : false;
+					}
+					break;
+				default:
+					break;
+			}
+
+
+			
 
 			if(data(dom,dataCache.checked)){
 				return;
@@ -930,13 +960,36 @@
 			var valueType = utils.getType(attrsValueObject.checked),
 				valueUpdateMethod = attrsValueObject.valueUpdate,
 				attrValAry = checkedValPattern.exec(dom.getAttribute(mvvm.trigger));
-
-			if(valueType === 'Function' && attrsValueObject.checked.name === observableFunctionName){
+			//console.log(111)
+			if(valueType === 'Function'){
 				data(dom,dataCache.checked,true);
-				valueUpdateMethod = valueUpdateMethod ? valueUpdateMethod : 'change';
+				//click 比 change兼容性好
+				valueUpdateMethod = valueUpdateMethod ? valueUpdateMethod : 'click';
 				events.on(dom,valueUpdateMethod,function(){
+					//console.log(111)
 					if(attrValAry && attrValAry.length>=2){
-						$parent[utils.trim(attrValAry[1])](dom.value);
+						//console.log(dom.value);
+						//console.log(111)
+						switch(type){
+							case 'radio':
+								$parent[utils.trim(attrValAry[1])](dom.value);
+								break;
+							case 'checkbox':
+								if(checkType === 'Boolean'){
+									$parent[utils.trim(attrValAry[1])](dom.checked);
+								}else if(checkType === 'Function'){
+
+									if(dom.checked){
+										$parent[utils.trim(attrValAry[1])].push(dom.value);
+									}else{
+										$parent[utils.trim(attrValAry[1])].remove(dom.value);
+									}
+								}
+								break;
+							default:
+								break;
+						}
+						
 					}
 				})
 			}

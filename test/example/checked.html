@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>MVVM-with</title>
+    <title>MVVM-checked</title>
     <meta charset="UTF-8">
     <style type="text/css">
     .red{
@@ -24,7 +24,8 @@
             var AppModel = function(){
                 this.name = 'I am app';
                 this.sex = mvvm.observable('male');
-                this.person = person;
+                this.person = mvvm.observableArray(['Jim','Lily']);
+                this.isGood = mvvm.observable(true);
             }
 
             mvvm.applyBindings(new AppModel())
@@ -40,8 +41,19 @@
     <input type="radio" data-bind="checked:sex" name="sex" value="male"/>男 　<input type="radio" data-bind="checked:sex" name="sex" value="female"/>女
 </p>
 
+<p data-bind="text:isGood"></p>
+<p>
+    <input type="checkbox" data-bind="checked:isGood"/>是
+</p>
 
-
+<ul data-bind="foreach:person">
+    <li data-bind="text:$data"></li>
+</ul>
+<p>
+    <input type="checkbox" value="Jim" data-bind="checked:person"/>Jim　
+    <input type="checkbox" value="Lily" data-bind="checked:person"/>Lily　
+    <input type="checkbox" value="Lucy" data-bind="checked:person"/>Lucy
+</p>
 
 
 </body>
