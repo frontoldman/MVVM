@@ -22,10 +22,22 @@
                 age:18
             }
             var AppModel = function(){
-                this.name = 'I am app';
- 
+               
                 this.people = mvvm.observableArray(['Jim','Lily']);
                 this.isGood = mvvm.observable(true);
+
+                this.family = ['Dad','Mom'];
+
+                this.messages = mvvm.observableArray([
+                        {name:'ZhangRan',code:'001'},
+                        {name:'LiSi',code:'002'}
+                    ])
+
+                this.choseVal = mvvm.observable();
+
+                this.messageRemove = function(){
+                    this.messages.pop();
+                }
             }
 
             mvvm.applyBindings(new AppModel())
@@ -38,7 +50,10 @@
 <b data-bind="text:sex"></b> 
 <select data-bind="options:people"></select>
 <hr/>
-<select data-bind="options:people"></select>
+<select data-bind="options:family"></select>
+<hr/>
+<select data-bind="options:messages,optionsText:'name',optionsCaption:'Choosing.....',value:choseVal"></select>
+<p data-bind="html:choseVal"></p>
 
 </body>
 </html>

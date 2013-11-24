@@ -96,7 +96,7 @@
 
 		var dataCache = {};
 
-		'css visible attr text html style ifAndIfnot foreach value checked'.split(' ').forEach(function(val,key){
+		'css visible attr text html style ifAndIfnot foreach value checked options'.split(' ').forEach(function(val,key){
 			dataCache[val] = 'mvvm-' + val;
 		})
 
@@ -961,16 +961,15 @@
 			var valueType = utils.getType(attrsValueObject.checked),
 				valueUpdateMethod = attrsValueObject.valueUpdate,
 				attrValAry = checkedValPattern.exec(dom.getAttribute(mvvm.trigger));
-			//console.log(111)
+
 			if(valueType === 'Function'){
 				data(dom,dataCache.checked,true);
 				//click 比 change兼容性好
 				valueUpdateMethod = valueUpdateMethod ? valueUpdateMethod : 'click';
 				events.on(dom,valueUpdateMethod,function(){
-					//console.log(111)
+	
 					if(attrValAry && attrValAry.length>=2){
-						//console.log(dom.value);
-						//console.log(111)
+			
 						switch(type){
 							case 'radio':
 								$parent[utils.trim(attrValAry[1])](dom.value);
@@ -998,26 +997,104 @@
 		}
 
 		//options
+		var optionsTextPattern =  /optionsText\s*:\s*['|"]([^']+)['|"],?/,
+			optionsValuePattern = /optionsValue\s*:\s*['|"]([^']+)['|"],?/,
+			optionsCaptionPattern = /optionsCaption\s*:\s*['|"]([^']+)['|"],?/,
+			optionsPattern = /options\s*:\s*(.+),?/;
 		function routeOptionsFn(ary){
 			var dom = ary[1],
-				value = ary[0],
+				optionsObj = ary[0],
+				type = utils.getType(optionsObj),
+				realForeachObj,
+				context = ary[2],
 				$parent = ary[2],
 				attrsValueObject = ary[3];
 
-			var optionsText = attrsValueObject.optionsText,
-				optionsValue = attrsValueObject.optionsValue,
-				optionsCaption = attrsValueObject.optionsCaption ;
+			
+			var childNodes = new Option(),
+				fragment = document.createDocumentFragment();
 
-			var type = utils.getType(value),
-				_result_value,
-				option;
+			var trigger = dom.getAttribute(mvvm.trigger),
+				attroptionsTextAry = optionsTextPattern.exec(trigger),
+				attroptionsValueAry = optionsValuePattern.exec(trigger),
+				attroptionsCaptionAry = optionsCaptionPattern.exec(trigger),
+				optionsText ,
+				optionsValue ,
+				optionsCaption ;
 
-			_result_value = type === 'Function' ? value() : value;
-			//console.log(_result_value)
-			_result_value.forEach(function(val,key){
-				option = new Option(val,val);
-				dom.options.add(option)
+			if(attroptionsTextAry && attroptionsTextAry.length >= 2){
+				optionsText = attroptionsTextAry[1];
+			}
+
+			if(attroptionsValueAry && attroptionsValueAry.length>=2){
+				optionsValue = attroptionsValueAry[1];
+			}
+			
+			if(attroptionsCaptionAry && attroptionsCaptionAry.length >= 2){
+				optionsCaption = attroptionsCaptionAry[1];
+				console.log(optionsCaption)
+				//var option = new Option(optionsCaption,'11'); 
+				var option = document.createElement('option');
+				option.innerHTML = optionsCaption;
+				fragment.appendChild(option);
+			}	
+
+			var triggerAttrs,html,value;
+
+			html = optionsText === undefined ? '$data' : optionsText;
+			value = optionsValue === undefined ? '$data' : optionsValue;
+			
+			triggerAttrs = "html:"+ html;
+			
+			childNodes.setAttribute( mvvm.trigger , triggerAttrs);
+			childNodes = [childNodes];
+
+
+			//当前childNode存储到缓存里面去
+			data(dom,dataCache['foreach'],[]);
+
+			switch(type){
+				case 'Function':
+					realForeachObj = optionsObj({
+						wapper:dom,
+						inner:childNodes,
+						context:context
+					});
+					break;
+				default:
+					realForeachObj = optionsObj;
+					break;
+			}
+
+
+			realForeachObj.forEach(function(objVal,objKey){
+				fillContext(childNodes,objVal,objKey,context,fragment,dom);
 			})
+
+			dom.appendChild(fragment);
+
+			if(data(dom,dataCache.options)){
+				return;
+			}
+
+			//给form元素绑定双向事件
+			var valueType = utils.getType(attrsValueObject.options),
+				attrValAry = valueValPattern.exec(dom.getAttribute(mvvm.trigger)),
+				valueUpdateMethod;
+
+			if(valueType === 'Function'){
+				data(dom,dataCache.options,true);
+		
+				valueUpdateMethod = 'change';
+				events.on(dom,valueUpdateMethod,function(){
+					
+					if(attrValAry && attrValAry.length>=2){
+						context[utils.trim(attrValAry[1])](dom.value);
+					}
+					
+				})
+			}
+
 		} 
 
 		//################################
@@ -1034,6 +1111,12 @@
 			currentAttr = currentAttr.replace(faultPattern,function($1,$2){
 				return "'" + $2 + "'" + ":"
 			});
+
+			//TODO 
+			//处理options问题
+
+
+
 			try{
 				_fn = new Function('scope','var attrObj ;with( scope ){attrObj = {'+ currentAttr +'}};return attrObj;')
 			}catch(e){
