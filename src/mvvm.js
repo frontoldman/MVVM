@@ -565,7 +565,8 @@
 			'valueUpdate':valueUpdate,
 			'enable':routeEnableFn,
 			'disbaled':routeDisableFn,
-			'checked':routeCheckedFn
+			'checked':routeCheckedFn,
+			'options':routeOptionsFn
 		}
 		
 		
@@ -995,6 +996,30 @@
 			}
 
 		}
+
+		//options
+		function routeOptionsFn(ary){
+			var dom = ary[1],
+				value = ary[0],
+				$parent = ary[2],
+				attrsValueObject = ary[3];
+
+			var optionsText = attrsValueObject.optionsText,
+				optionsValue = attrsValueObject.optionsValue,
+				optionsCaption = attrsValueObject.optionsCaption ;
+
+			var type = utils.getType(value),
+				_result_value,
+				option;
+
+			_result_value = type === 'Function' ? value() : value;
+			//console.log(_result_value)
+			_result_value.forEach(function(val,key){
+				option = new Option(val,val);
+				dom.options.add(option)
+			})
+		} 
+
 		//################################
 		//常用方法
 		function getRandom(){

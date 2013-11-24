@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MVVM-options</title>
+    <meta charset="UTF-8">
+    <style type="text/css">
+    .red{
+        color:red;
+    }
+    .green{
+        color:green;
+    }
+    </style>
+    <script type="text/javascript" src="../../lib/load.js"></script>
+    <script type="text/javascript">
+		
+		
+
+        require(['.../src/mvvm'],function(mvvm){
+            var person = {
+                name:'li',
+                age:18
+            }
+            var AppModel = function(){
+                this.name = 'I am app';
+ 
+                this.people = mvvm.observableArray(['Jim','Lily']);
+                this.isGood = mvvm.observable(true);
+            }
+
+            mvvm.applyBindings(new AppModel())
+        })
+       
+    </script>
+</head>
+<body>
+
+<b data-bind="text:sex"></b> 
+<select data-bind="options:people"></select>
+<hr/>
+<select data-bind="options:people"></select>
+
+</body>
+</html>
