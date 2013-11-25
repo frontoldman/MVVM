@@ -859,9 +859,14 @@
 		var valueValPattern = /value\s*:\s*(.+),?/;
 		function routeValueFn(ary){
 			var dom = ary[1],
-				value = ary[0],
-				$parent = ary[2],
-				attrsValueObject = ary[3];
+			value = ary[0],
+			$parent = ary[2],
+			attrsValueObject = ary[3];
+
+			//value只绑定输入框
+			if(!/input/i.test(dom.tagName)){
+				return;
+			}
 
 			dom.value = value;
 			
@@ -1008,7 +1013,8 @@
 				realForeachObj,
 				context = ary[2],
 				$parent = ary[2],
-				attrsValueObject = ary[3];
+				attrsValueObject = ary[3],
+				defaultStart = 0;
 
 			
 			var childNodes = new Option(),
@@ -1032,11 +1038,12 @@
 			
 			if(attroptionsCaptionAry && attroptionsCaptionAry.length >= 2){
 				optionsCaption = attroptionsCaptionAry[1];
-				console.log(optionsCaption)
+				//console.log(optionsCaption)
 				//var option = new Option(optionsCaption,'11'); 
 				var option = document.createElement('option');
 				option.innerHTML = optionsCaption;
 				fragment.appendChild(option);
+				defaultStart = 1;
 			}	
 
 			var triggerAttrs,html,value;
@@ -1087,9 +1094,14 @@
 		
 				valueUpdateMethod = 'change';
 				events.on(dom,valueUpdateMethod,function(){
-					
 					if(attrValAry && attrValAry.length>=2){
-						context[utils.trim(attrValAry[1])](dom.value);
+						var index = dom.selectedIndex;
+						index = index - defaultStart ;
+						var currentVal = realForeachObj[index];
+
+						if(currentVal){
+							context[utils.trim(attrValAry[1])](currentVal);
+						}
 					}
 					
 				})

@@ -35,6 +35,13 @@
 
                 this.choseVal = mvvm.observable();
 
+                this.code = mvvm.computed(function(){
+                    var choseVal = this.choseVal();
+                    if(choseVal){
+                        return choseVal.code
+                    }
+                },this);
+
                 this.messageRemove = function(){
                     this.messages.pop();
                 }
@@ -53,7 +60,7 @@
 <select data-bind="options:family"></select>
 <hr/>
 <select data-bind="options:messages,optionsText:'name',optionsCaption:'Choosing.....',value:choseVal"></select>
-<p data-bind="html:choseVal"></p>
+<p data-bind="html:code"></p>
 
 </body>
 </html>
