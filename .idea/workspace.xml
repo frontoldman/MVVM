@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="3eb9b880-a851-45dd-a05e-8723b4af0354" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/example/index.html" afterPath="$PROJECT_DIR$/test/example/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/mvvm.js" afterPath="$PROJECT_DIR$/src/mvvm.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/example/style.html" afterPath="$PROJECT_DIR$/test/example/style.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/example/with.html" afterPath="$PROJECT_DIR$/test/example/with.html" />
-    </list>
+    <list default="true" id="3eb9b880-a851-45dd-a05e-8723b4af0354" name="Default" comment="" />
     <ignored path="MVVM.iws" />
     <ignored path=".idea/workspace.xml" />
     <file path="/Dummy.txt" changelist="3eb9b880-a851-45dd-a05e-8723b4af0354" time="1385359263112" ignored="false" />
@@ -65,7 +60,7 @@
       <file leaf-file-name="with.html" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test/example/with.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="42" column="0" selection-start="1007" selection-end="1007" vertical-scroll-proportion="0.56686044">
+            <state line="18" column="52" selection-start="361" selection-end="361" vertical-scroll-proportion="0.113372095">
               <folding />
             </state>
           </provider>
@@ -382,7 +377,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test/example/with.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="42" column="0" selection-start="1007" selection-end="1007" vertical-scroll-proportion="0.56686044">
+        <state line="18" column="52" selection-start="361" selection-end="361" vertical-scroll-proportion="0.113372095">
           <folding />
         </state>
       </provider>
