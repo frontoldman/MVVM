@@ -2,16 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3eb9b880-a851-45dd-a05e-8723b4af0354" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/example/index.html" afterPath="$PROJECT_DIR$/test/example/index.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/mvvm.js" afterPath="$PROJECT_DIR$/src/mvvm.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test-10-24.html" afterPath="$PROJECT_DIR$/test/test-10-24.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/example/style.html" afterPath="$PROJECT_DIR$/test/example/style.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/example/with.html" afterPath="$PROJECT_DIR$/test/example/with.html" />
     </list>
     <ignored path="MVVM.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="3eb9b880-a851-45dd-a05e-8723b4af0354" time="1383209110619" ignored="false" />
+    <file path="/Dummy.txt" changelist="3eb9b880-a851-45dd-a05e-8723b4af0354" time="1385359263112" ignored="false" />
     <file path="/a.js" changelist="3eb9b880-a851-45dd-a05e-8723b4af0354" time="1383184609484" ignored="false" />
     <file path="/a.coffee" changelist="3eb9b880-a851-45dd-a05e-8723b4af0354" time="1383184618906" ignored="false" />
     <file path="/mvvm.js" changelist="3eb9b880-a851-45dd-a05e-8723b4af0354" time="1383213214595" ignored="false" />
     <file path="/test-10-24.html" changelist="3eb9b880-a851-45dd-a05e-8723b4af0354" time="1383212943130" ignored="false" />
+    <file path="/index.html" changelist="3eb9b880-a851-45dd-a05e-8723b4af0354" time="1385359954475" ignored="false" />
+    <file path="/style.html" changelist="3eb9b880-a851-45dd-a05e-8723b4af0354" time="1385360031549" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,16 +38,34 @@
       <file leaf-file-name="mvvm.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/mvvm.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="331" column="66" selection-start="9078" selection-end="9078" vertical-scroll-proportion="-15.76">
+            <state line="8" column="99" selection-start="383" selection-end="383" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test-10-24.html" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/test/test-10-24.html">
+      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/example/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="56" column="55" selection-start="1931" selection-end="1931" vertical-scroll-proportion="0.4018127">
+            <state line="79" column="38" selection-start="2224" selection-end="2224" vertical-scroll-proportion="-19.67742">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="style.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/example/style.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="40" column="64" selection-start="1228" selection-end="1228" vertical-scroll-proportion="-13.419354">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="with.html" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/test/example/with.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="42" column="0" selection-start="1007" selection-end="1007" vertical-scroll-proportion="0.56686044">
               <folding />
             </state>
           </provider>
@@ -69,6 +91,9 @@
       <list>
         <option value="$PROJECT_DIR$/test/test-10-24.html" />
         <option value="$PROJECT_DIR$/src/mvvm.js" />
+        <option value="$PROJECT_DIR$/test/example/index.html" />
+        <option value="$PROJECT_DIR$/test/example/style.html" />
+        <option value="$PROJECT_DIR$/test/example/with.html" />
       </list>
     </option>
   </component>
@@ -146,6 +171,24 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
+              <option name="myItemId" value="test" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="example" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="MVVM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="MVVM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
               <option name="myItemId" value="src" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -161,8 +204,8 @@
     <property name="options.lastSelected" value="Errors" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="FullScreen" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
   </component>
   <component name="RunManager">
     <configuration default="true" type="DartUnitRunConfigurationType" factoryName="DartUnit">
@@ -185,7 +228,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1456" height="876" extended-state="1" />
+    <frame x="-8" y="-8" width="1456" height="876" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -269,6 +312,20 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/mvvm.js">
       <provider selected="true" editor-type-id="text-editor">
+        <state line="331" column="66" selection-start="9113" selection-end="9113" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/test-10-24.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="55" selection-start="1931" selection-end="1931" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/mvvm.js">
+      <provider selected="true" editor-type-id="text-editor">
         <state line="35" column="0" selection-start="1141" selection-end="1141" vertical-scroll-proportion="0.0">
           <folding />
         </state>
@@ -295,16 +352,37 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/mvvm.js">
+    <entry file="file://$PROJECT_DIR$/test/test-10-24.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="331" column="66" selection-start="9078" selection-end="9078" vertical-scroll-proportion="-15.76">
+        <state line="93" column="35" selection-start="3388" selection-end="3388" vertical-scroll-proportion="0.8822674">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/test-10-24.html">
+    <entry file="file://$PROJECT_DIR$/src/mvvm.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="56" column="55" selection-start="1931" selection-end="1931" vertical-scroll-proportion="0.4018127">
+        <state line="8" column="99" selection-start="383" selection-end="383" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/example/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="79" column="38" selection-start="2224" selection-end="2224" vertical-scroll-proportion="-19.67742">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/example/style.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="64" selection-start="1228" selection-end="1228" vertical-scroll-proportion="-13.419354">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/example/with.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="42" column="0" selection-start="1007" selection-end="1007" vertical-scroll-proportion="0.56686044">
           <folding />
         </state>
       </provider>
